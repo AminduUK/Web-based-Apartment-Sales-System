@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create account | Nook & Key</title>
+  <link rel="stylesheet" href="css/signup_page.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-layout">
+    <section class="auth-brand-panel">
+      <a href="index.html" class="logo">nook<span>&</span>key</a>
+      <div>
+        <p class="eyebrow" id="brandEyebrow">Buyer Portal</p>
+        <h1 id="brandTitle">Find the place that feels like <em>you.</em></h1>
+        <p id="brandDescription">Explore verified apartments, connect with trusted sellers and agents, and manage your next move in one simple place.</p>
+      </div>
+      <small>Homes, handled with heart.</small>
+    </section>
+
+    <section class="auth-form-panel">
+      <a href="index.html" class="back-link">← Back to home</a>
+      <div class="auth-form-container">
+        <p class="eyebrow" id="formEyebrow">Join Nook & Key</p>
+        <h2 id="formTitle">Create your account</h2>
+        <p class="form-description" id="formDescription">Select whether you are buying, selling, or working as a certified agent.</p>
+
+        <!-- Role Selector Dropdown (Buyer, Seller, Agent only) -->
+        <div class="role-selector-container">
+          <label for="role">Registering as:
+            <select id="role" name="role" required>
+              <option value="BUYER" selected>Apartment Buyer</option>
+              <option value="SELLER">Property Seller</option>
+              <option value="AGENT">Real Estate Agent</option>
+            </select>
+          </label>
+        </div>
+
+        <form id="signupForm">
+          <!-- Common Name fields -->
+          <div class="form-row">
+            <label>First name
+              <input id="firstName" type="text" placeholder="e.g. Kasun" required />
+            </label>
+            <label>Last name
+              <input id="lastName" type="text" placeholder="e.g. Perera" required />
+            </label>
+          </div>
+
+          <!-- Common Email field -->
+          <label>Email address
+            <input id="email" type="email" placeholder="you@example.com" required />
+          </label>
+
+          <!-- Common Phone field -->
+          <label>Phone number
+            <input id="phone" type="tel" placeholder="+94 77 123 4567" required />
+          </label>
+
+          <!-- AGENT specific fields (Shown only for AGENT) -->
+          <div id="agentFields" class="role-fields hidden">
+            <label>Agent License Number <span class="required-star">*</span>
+              <input id="licenseNumber" type="text" placeholder="e.g. REA-2024-889" />
+            </label>
+            <label>Agency / Brokerage Name
+              <input id="agencyName" type="text" placeholder="e.g. Prime Residencies / Independent" />
+            </label>
+          </div>
+
+          <!-- SELLER specific fields (Shown only for SELLER) -->
+          <div id="sellerFields" class="role-fields hidden">
+            <label>Seller Type
+              <select id="sellerType">
+                <option value="INDIVIDUAL">Individual Apartment Owner</option>
+                <option value="DEVELOPER">Property Developer</option>
+                <option value="COMPANY">Real Estate Firm / Company</option>
+              </select>
+            </label>
+            <label>Primary Location / City
+              <input id="sellerCity" type="text" placeholder="e.g. Colombo, Kandy, Galle" />
+            </label>
+          </div>
+
+          <!-- BUYER specific fields (Shown only for BUYER) -->
+          <div id="buyerFields" class="role-fields">
+            <label>Preferred Property Location
+              <input id="preferredCity" type="text" placeholder="e.g. Colombo 03, Rajagiriya, Dehiwala" />
+            </label>
+          </div>
+
+          <!-- Password fields -->
+          <div class="form-row">
+            <label>Password
+              <input id="password" type="password" placeholder="At least 8 characters" minlength="8" required />
+            </label>
+            <label>Confirm Password
+              <input id="confirmPassword" type="password" placeholder="Re-enter password" minlength="8" required />
+            </label>
+          </div>
+
+          <label class="checkbox-label">
+            <input id="terms" type="checkbox" required /> I agree to the Terms of Use and Privacy Policy.
+          </label>
+
+          <button id="submitButton" class="primary-button full-width" type="submit">Create Buyer Account →</button>
+        </form>
+
+        <p id="signupMessage" class="message"></p>
+        <p class="auth-switch">Already have an account? <a href="signIn_page.html">Sign in →</a></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/signup_page.js"></script>
+</body>
+</html>

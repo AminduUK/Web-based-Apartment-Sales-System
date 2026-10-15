@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nook & Key | Apartment Sales System</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/i18n.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="index.html" class="logo">nook<span>&</span>key</a>
+    <nav>
+      <a href="#home" data-i18n="nav_home">Home</a>
+      <a href="#cinematic" data-i18n="cinematic_eyebrow">Showcase</a>
+      <a href="#properties" data-i18n="nav_properties">Properties</a>
+      <a href="#about" data-i18n="nav_about">About</a>
+
+      <!-- Language Selector Dropdown -->
+      <div class="lang-selector-dropdown" id="langDropdown">
+        <button class="lang-btn" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false" title="Switch language / භාෂාව / மொழி">
+          <span class="lang-flag" id="currentLangFlag">🇬🇧</span>
+          <span class="lang-label" id="currentLangLabel">English</span>
+          <span class="lang-caret">▾</span>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <button type="button" class="lang-item active" data-lang="en">
+            <span class="lang-item-flag">🇬🇧</span>
+            <span class="lang-item-text"><strong>English</strong> <small>Default</small></span>
+          </button>
+          <button type="button" class="lang-item" data-lang="si">
+            <span class="lang-item-flag">🇱🇰</span>
+            <span class="lang-item-text"><strong>සිංහල</strong> <small>Sinhala</small></span>
+          </button>
+          <button type="button" class="lang-item" data-lang="ta">
+            <span class="lang-item-flag">🇱🇰</span>
+            <span class="lang-item-text"><strong>தமிழ்</strong> <small>Tamil</small></span>
+          </button>
+        </div>
+      </div>
+
+      <a href="signIn_page.html" class="outline-button" data-i18n="nav_signin">Sign in</a>
+      <a href="signup_page.html" class="primary-button" data-i18n="nav_signup">Create account</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <p class="eyebrow" data-i18n="home_eyebrow">A better way home</p>
+        <h1 data-i18n="home_title">Find the place that feels like <em>you.</em></h1>
+        <p class="hero-text" data-i18n="home_subtitle">Discover verified apartments, connect with trusted sellers and agents, and manage your next move in one simple place.</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#properties" data-i18n="home_explore_btn">Explore apartments</a>
+          <a class="text-button" href="signup_page.html" data-i18n="home_get_started">Get started →</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-content">
+          <p data-i18n="home_card_p">Featured collection</p>
+          <h2 data-i18n="home_card_h2">City living,<br /><em>softened.</em></h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- Living Architectural Showcase Section (Interactive 3D Experience) -->
+    <section id="cinematic" class="cinematic-section">
+      <div class="cinematic-container">
+        <!-- Interactive 3D Canvas -->
+        <canvas id="architectureCanvas" class="architecture-canvas"></canvas>
+
+        <!-- Ambient Luxury Lighting Glows -->
+        <div class="arch-glow-sphere glow-amber"></div>
+        <div class="arch-glow-sphere glow-teal"></div>
+
+        <!-- Floating Glassmorphic Feature Badges -->
+        <div class="arch-floating-badge badge-top-left">
+          <span class="arch-pulse-dot"></span>
+          <div>
+            <strong data-i18n="arch_feat_skyline">Skyline Cantilevers & Glass</strong>
+            <small data-i18n="arch_feat_sub1">Floor-to-Ceiling Thermal Glazing</small>
+          </div>
+        </div>
+
+        <div class="arch-floating-badge badge-bottom-right">
+          <span class="arch-pulse-dot green"></span>
+          <div>
+            <strong data-i18n="arch_feat_infinity">Reflecting Pool & Terraces</strong>
+            <small data-i18n="arch_feat_sub2">Landscape Integrated Architecture</small>
+          </div>
+        </div>
+
+        <div class="cinematic-overlay">
+          <div class="cinematic-top-bar">
+            <div class="cinematic-badge">
+              <span class="live-dot"></span>
+              <span data-i18n="cinematic_eyebrow">Living Architectural Showcase</span>
+            </div>
+            <div class="cinematic-story-pills">
+              <button type="button" class="story-pill active" data-mode="sunset" data-i18n="cinematic_pill1">01 · Sunset & Infinity Light</button>
+              <button type="button" class="story-pill" data-mode="twilight" data-i18n="cinematic_pill2">02 · Twilight & Pool Reflections</button>
+              <button type="button" class="story-pill" data-mode="blueprint" data-i18n="cinematic_pill3">03 · Architectural Blueprint</button>
+            </div>
+          </div>
+          <div class="cinematic-bottom-bar">
+            <div class="cinematic-content">
+              <p class="eyebrow" data-i18n="cinematic_eyebrow">Interactive 3D Architectural Experience</p>
+              <h2 data-i18n="cinematic_title">Residences shaped by the <em>landscape.</em></h2>
+              <p data-i18n="cinematic_sub">Move your cursor to orbit perspectives, explore ambient lighting, and discover luxury cantilevered living spaces.</p>
+            </div>
+            <div class="cinematic-controls">
+              <button id="cinematicModeBtn" type="button" class="cinematic-control-btn" title="Toggle perspective / isometric">
+                <span id="modeIcon">✨</span> <span id="modeLabel">Isometric View</span>
+              </button>
+              <button id="cinematicPlayBtn" type="button" class="cinematic-control-btn" title="Pause or play rotation">
+                <span id="playIcon">⏸</span> <span id="playLabel" data-i18n="cinematic_btn_pause">Pause Motion</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="properties" class="section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="props_eyebrow">Make a move</p>
+          <h2 data-i18n="props_title">Find your next address.</h2>
+        </div>
+        <p data-i18n="props_sub">Search homes that match your lifestyle, budget, and plans.</p>
+      </div>
+
+      <form id="propertySearchForm" class="search-box">
+        <input id="locationInput" type="text" placeholder="City or neighborhood" data-i18n-placeholder="props_input_placeholder" />
+        <select id="propertyType">
+          <option value="" data-i18n="props_any_type">Any property type</option>
+          <option value="APARTMENT" data-i18n="props_apt">Apartment</option>
+          <option value="PENTHOUSE" data-i18n="props_penthouse">Penthouse</option>
+          <option value="TOWNHOUSE" data-i18n="props_townhouse">Townhouse</option>
+        </select>
+        <select id="budget">
+          <option value="" data-i18n="props_any_budget">Any budget</option>
+          <option value="under-25" data-i18n="props_b1">Under LKR 25M</option>
+          <option value="25-50" data-i18n="props_b2">LKR 25M - 50M</option>
+          <option value="over-50" data-i18n="props_b3">Over LKR 50M</option>
+        </select>
+        <button class="primary-button" type="submit" data-i18n="props_search_btn">Search</button>
+      </form>
+      <p id="propertyMessage" class="message"></p>
+
+      <div id="propertyGrid" class="property-grid">
+        <article class="property-card" onclick="window.location.href='signup_page.html'" style="cursor: pointer;"><div class="property-image image-one"></div><div class="property-details"><span class="tag" data-i18n="card_tag_ready">Move-in ready</span><h3>The Fern House</h3><p>Colombo 07, Sri Lanka</p><strong>LKR 48.5M</strong></div></article>
+        <article class="property-card" onclick="window.location.href='signup_page.html'" style="cursor: pointer;"><div class="property-image image-two"></div><div class="property-details"><span class="tag" data-i18n="card_tag_new">New release</span><h3>Aurelia Residences</h3><p>Rajagiriya, Sri Lanka</p><strong>LKR 32.8M</strong></div></article>
+        <article class="property-card" onclick="window.location.href='signup_page.html'" style="cursor: pointer;"><div class="property-image image-three"></div><div class="property-details"><span class="tag" data-i18n="card_tag_garden">Garden living</span><h3>Canopy Court</h3><p>Battaramulla, Sri Lanka</p><strong>LKR 26.2M</strong></div></article>
+      </div>
+    </section>
+
+    <section id="about" class="dark-section">
+      <p class="eyebrow" data-i18n="about_eyebrow">One place, every perspective</p>
+      <h2 data-i18n="about_title">Built for the whole<br /><em>apartment journey.</em></h2>
+      <p data-i18n="about_sub">Buyers, sellers, agents, verification officers, booking managers, and admins can work together through role-based Spring Boot services.</p>
+    </section>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/architecture_showcase.js"></script>
+</body>
+</html>

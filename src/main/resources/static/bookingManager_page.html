@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking manager dashboard | Nook & Key</title>
+  <link rel="stylesheet" href="css/bookingManager_page.css" />
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes rowFadeIn {
+      from { opacity: 0.15; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+    .row-fade-in {
+      animation: rowFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar"><a href="index.html" class="logo">nook<span>&</span>key</a><div class="workspace-label">Booking operations</div><nav class="side-nav"><a class="active" href="#overview">▦ <span>Overview</span></a><a href="#bookings">□ <span>All bookings</span><b id="bookingCount">-</b></a><a href="#calendar">◷ <span>Calendar</span></a><a href="#viewings">⌂ <span>Viewings</span><b>3</b></a><a href="#reports">▥ <span>Reports</span></a></nav><div class="sidebar-bottom"><a href="index.html">↩ <span>Back to website</span></a><button id="logoutButton">⇥ <span>Sign out</span></button></div></aside>
+  <main class="dashboard-main"><header class="topbar"><div><p class="eyebrow" id="todayDate">Wednesday, 17 September 2026</p><h1>Good morning, <em id="managerGreeting">Booking Manager.</em></h1></div><div class="topbar-actions"><button class="icon-button" onclick="document.getElementById('bookingSearch').focus()">⌕</button><button class="notification-button" id="managerNotifBtn" title="Notifications" style="position:relative;">◔<span id="managerNotifBadge" class="hidden" style="position:absolute; top:-3px; right:-3px; background:#e8785a; color:white; border-radius:50%; font-size:9px; width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; font-weight:bold;">0</span></button><div class="profile-chip" id="profileChip" style="cursor:pointer;" title="View and edit profile"><span class="avatar" id="userAvatar">BM</span><span><strong id="userFullName">Booking Manager</strong><small>Booking operations</small></span><span>⌄</span></div></div></header>
+    <section class="operations-card"><div><p class="eyebrow">Today at a glance</p><h2>Keep every<br /><em>move in motion.</em></h2><p>Coordinate viewings, confirm bookings, and make the handoff from interest to keys feel effortless.</p></div><div class="date-card"><span id="dateCardDay">WED</span><strong id="dateCardNum">17</strong><small id="dateCardMonthYear">September 2026</small></div></section>
+    <section class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+      <article class="stat-card featured"><div class="stat-top"><span>Total bookings</span><span class="stat-icon">□</span></div><strong id="statTotalBookings">0</strong><p><b id="statPendingBookings">0</b> pending confirmation</p></article>
+      <article class="stat-card"><div class="stat-top"><span>Accepted viewings</span><span class="stat-icon orange">◷</span></div><strong id="statAcceptedBookings">0</strong><p>Active scheduled appointments</p></article>
+      <article class="stat-card"><div class="stat-top"><span>Completed viewings</span><span class="stat-icon green">✓</span></div><strong id="statCompletedBookings">0</strong><p>Successfully conducted</p></article>
+      <article class="stat-card" id="statCardDisputes" style="cursor:pointer; border:1px solid #fed7aa; background:#fffaf5; transition: transform .2s, box-shadow .2s;" title="Click to view disputed bookings queue">
+        <div class="stat-top"><span style="color:#c2410c; font-weight:700;">Dispute Queue</span><span class="stat-icon" style="color:#ea580c; background:#ffedd5;">⚖️</span></div>
+        <strong id="statDisputedBookings" style="color:#c2410c;">0</strong>
+        <p><b id="statOpenDisputes" style="color:#ea580c; font-weight:800;">0</b> open dispute cases</p>
+      </article>
+      <article class="stat-card"><div class="stat-top"><span>Operations status</span><span class="stat-icon purple">✓</span></div><strong>Active</strong><p>All dispatch channels live</p></article>
+    </section>
+    <section id="bookings" class="content-card">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Operations queue</p>
+          <h2>Booking requests</h2>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="secondary-button" id="quickDisputesBtn" style="border:1px solid #fdba74; background:#fff7ed; color:#c2410c; font-weight:700; display:inline-flex; align-items:center; gap:6px;" title="Filter open disputes queue">
+            <span>⚖️</span> Disputed Queue <span id="quickDisputeBadge" style="background:#ea580c; color:white; border-radius:10px; padding:1px 6px; font-size:9px; font-weight:800;">0</span>
+          </button>
+          <button class="secondary-button" id="refreshBookings">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="booking-toolbar" style="display: flex; gap: 9px; margin: 25px 0 14px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 4px;">
+          <div class="search-input" id="bookingSearchContainer" style="display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); font-size: 16px; background: white; height: 38px; box-sizing: border-box; transition: border-color .2s, box-shadow .2s;">
+            <span>⌕</span>
+            <input id="bookingSearch" type="search" placeholder="Search buyer, property, owner, or payment ref..." style="width: 100%; padding: 8px 0; border: 0; outline: 0; font-size: 11px; background: transparent; color: var(--ink);" />
+            <button type="button" id="clearBookingSearchBtn" style="display: none; border: none; background: transparent; color: #94a3b8; font-size: 15px; cursor: pointer; padding: 0 4px;" title="Clear search">✕</button>
+          </div>
+          <div id="bookingSearchValidationError" style="display: none; align-items: center; gap: 5px; color: #dc2626; font-size: 11px; font-weight: 600; padding: 2px 4px;">
+            <span>⚠️</span>
+            <span id="bookingSearchValidationText">Please enter a search term before searching.</span>
+          </div>
+        </div>
+        <button type="button" id="bookingSearchBtn" class="primary-button" style="padding: 0 18px; font-size: 11px; height: 38px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; border-radius: 7px; cursor: pointer;">
+          <span>🔍</span> Search
+        </button>
+        <select id="bookingFilter" style="height: 38px; min-width: 155px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; outline: 0; font-size: 11px; background: white; color: var(--ink); cursor: pointer;">
+          <option value="ALL">All statuses</option>
+          <option value="DISPUTED_OPEN" style="font-weight:bold; color:#c2410c;">⚠️ Open Disputes (Action Required)</option>
+          <option value="DISPUTED" style="color:#b45309;">⚖️ All Disputed Bookings</option>
+          <option value="PENDING">Pending</option>
+          <option value="ACCEPTED">Accepted</option>
+          <option value="CANCELLED">Cancelled (Refunds)</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Buyer</th><th>Property</th><th>Viewing Date</th><th>Listing Owner</th><th>Advance Paid</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bookingTableBody"></tbody></table></div><div id="emptyState" class="empty-state hidden">No booking requests match your search.</div></section>
+    <div class="lower-grid"><section id="calendar" class="content-card"><div class="section-header compact"><div><p class="eyebrow">Schedule</p><h2>Next on calendar</h2></div><a href="#calendar">Open calendar →</a></div><div class="calendar-list"><div><span class="calendar-day">17<strong>WED</strong></span><div><strong>The Fern House</strong><p>10:30 AM · Buyer viewing</p></div><span class="calendar-dot confirmed-dot"></span></div><div><span class="calendar-day">17<strong>WED</strong></span><div><strong>Aurelia Residences</strong><p>01:00 PM · Buyer viewing</p></div><span class="calendar-dot pending-dot"></span></div><div><span class="calendar-day">18<strong>THU</strong></span><div><strong>Canopy Court</strong><p>11:15 AM · Handover meeting</p></div><span class="calendar-dot purple-dot"></span></div></div></section><section id="reports" class="content-card"><div class="section-header compact"><div><p class="eyebrow">Team pulse</p><h2>Daily activity</h2></div><span class="live-label">● Live</span></div><div class="activity-chart"><div class="chart-bars"><i style="height:35%"></i><i style="height:55%"></i><i style="height:42%"></i><i style="height:78%"></i><i style="height:58%"></i><i style="height:88%"></i><i style="height:70%"></i></div><div class="chart-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div><p class="activity-note"><b>+18%</b> more confirmed viewings than last week.</p></section></div>
+  </main>
+
+  <!-- Notifications Modal -->
+  <div id="managerNotifModal" class="modal hidden">
+    <div class="modal-card" style="width: min(100%, 520px); max-height: 80vh; overflow-y: auto;">
+      <button class="close-button" id="closeManagerNotifModal">×</button>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h3 style="margin:0; font-size:18px; color:var(--ink);">Operations Notifications</h3>
+        <button id="refreshManagerNotifsBtn" style="border:none; background:transparent; color:var(--coral); cursor:pointer; font-size:12px; font-weight:bold;">↻ Refresh</button>
+      </div>
+      <div id="managerNotifList" style="display:grid; gap:10px; max-height:350px; overflow-y:auto;">
+        <p style="color:var(--muted); font-size:13px;">Loading notifications...</p>
+      </div>
+      <div style="margin-top:20px; text-align:right;">
+        <button class="secondary-button" id="closeManagerNotifModalBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Details & Edit Modal -->
+  <div id="profileModal" class="modal hidden">
+    <div class="modal-card" style="width: min(100%, 520px); max-height: 90vh; overflow-y: auto;">
+      <button class="close-button" id="closeProfileModal">×</button>
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <span class="avatar" id="modalAvatar" style="width:52px; height:52px; font-size:18px;">BM</span>
+        <div>
+          <h3 id="modalFullName" style="margin:0; font-size:18px; color:var(--ink);">Booking Manager</h3>
+          <p style="margin:4px 0 0; font-size:13px; color:var(--muted);">Staff Account · <span style="color:var(--green); font-weight:bold;">ACTIVE</span></p>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div style="display:flex; border-bottom:1px solid var(--line); margin-bottom:16px; gap:8px;">
+        <button type="button" id="tabManagerProfileInfo" style="padding:8px 16px; border:none; background:transparent; font-size:12px; font-weight:700; color:var(--ink); border-bottom:2px solid var(--coral); cursor:pointer;">Personal Info</button>
+        <button type="button" id="tabManagerPassword" style="padding:8px 16px; border:none; background:transparent; font-size:12px; font-weight:700; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer;">Change Password 🔐</button>
+      </div>
+
+      <!-- Tab 1: Profile Info -->
+      <div id="tabManagerContentProfile">
+        <form id="updateProfileForm" style="display:grid; gap:12px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <label style="font-size:11px; font-weight:bold; color:var(--ink);">First Name *
+              <input type="text" id="editFirstName" required style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+            </label>
+            <label style="font-size:11px; font-weight:bold; color:var(--ink);">Last Name *
+              <input type="text" id="editLastName" required style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+            </label>
+          </div>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Email (Read-Only)
+            <input type="email" id="editEmail" disabled style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; background:#f5f5f5; color:var(--muted); box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Phone Number
+            <input type="tel" id="editPhone" placeholder="+94 77 123 4567" style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <p id="profileMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <button type="button" id="modalLogoutButton" class="secondary-button" style="color:var(--coral);">Sign out</button>
+            <button type="submit" id="saveProfileBtn" class="primary-button" style="padding:9px 20px;">Save Changes →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab 2: Change Password -->
+      <div id="tabManagerContentPassword" class="hidden">
+        <form id="changePasswordForm" style="display:grid; gap:12px;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; font-size:12px; color:#166534; display:flex; gap:12px; align-items:flex-start;">
+            <span style="font-size:22px; line-height:1;">✉️</span>
+            <div>
+              <strong style="display:block; margin-bottom:2px; font-size:12.5px; color:#14532d;">Direct Security Email Alert</strong>
+              Confirmation email will be sent directly to your logged-in account: 
+              <strong id="changePasswordTargetEmail" style="color:#0f172a; text-decoration:underline;">[Logged-in Email]</strong>
+              <div style="font-size:11px; color:#15803d; margin-top:3px;">Dispatched automatically to active session · No email selection or typing needed.</div>
+            </div>
+          </div>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Current Password *
+            <input type="password" id="changeCurrentPassword" required placeholder="Enter current password" style="width:100%; padding:9px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">New Password (min 8 characters) *
+            <input type="password" id="changeNewPassword" minlength="8" required placeholder="••••••••" style="width:100%; padding:9px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Confirm New Password *
+            <input type="password" id="changeConfirmPassword" minlength="8" required placeholder="••••••••" style="width:100%; padding:9px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <p id="passwordChangeMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+          <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px;">
+            <button type="submit" id="savePasswordBtn" class="primary-button" style="padding:9px 22px;">Update Password & Send Email Alert →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dispute Resolution & Investigation Modal (UC - 06: Manage Booking Disputes) -->
+  <div id="disputeModal" class="modal hidden" style="z-index: 1200;">
+    <div class="modal-card" style="width: min(100%, 650px); max-height: 90vh; overflow-y: auto; padding: 26px 28px;">
+      <button class="close-button" id="closeDisputeModal">×</button>
+      
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--line); padding-bottom:12px;">
+        <div>
+          <span style="font-size:10px; font-weight:800; color:#ea580c; text-transform:uppercase; letter-spacing:1px; background:#fff7ed; padding:3px 8px; border-radius:12px; border:1px solid #fed7aa;">
+            Dispute Resolution Mediation (UC-06)
+          </span>
+          <h2 style="margin:6px 0 0; font-size:22px; color:var(--ink);">Case <span id="disputeModalCaseId">#DSP-BK</span></h2>
+        </div>
+        <div id="disputeModalCurrentBadge" style="font-size:11px; font-weight:bold; padding:4px 10px; border-radius:16px; background:#ffedd5; color:#c2410c;">
+          OPEN
+        </div>
+      </div>
+
+      <!-- Dispute Overview Cards -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <!-- Left: Complainant details -->
+        <div style="background:#fffaf0; border:1px solid #fde68a; border-radius:9px; padding:12px;">
+          <div style="font-size:10px; font-weight:800; color:#b45309; text-transform:uppercase; margin-bottom:4px; display:flex; align-items:center; gap:5px;">
+            <span>⚠️</span> Raised By Complainant
+          </div>
+          <strong id="disputeModalRaisedBy" style="font-size:13px; color:#1e293b; display:block;">—</strong>
+          <div id="disputeModalRaisedDate" style="font-size:11px; color:#64748b; margin-top:2px;">—</div>
+          <div style="margin-top:8px; font-size:11.5px; color:#1e293b; background:white; padding:8px 10px; border-radius:6px; border:1px solid #fed7aa;">
+            <strong style="display:block; font-size:10.5px; color:#c2410c; margin-bottom:2px;">Dispute Category:</strong>
+            <span id="disputeModalReasonCategory" style="font-weight:700;">—</span>
+          </div>
+        </div>
+
+        <!-- Right: Booking & Payment info -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:12px;">
+          <div style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:4px; display:flex; align-items:center; gap:5px;">
+            <span>📋</span> Viewing & Deposit
+          </div>
+          <strong id="disputeModalProperty" style="font-size:13px; color:#0f172a; display:block;">—</strong>
+          <div id="disputeModalSchedule" style="font-size:11px; color:#475569; margin-top:2px;">—</div>
+          <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; background:white; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
+            <div>
+              <span style="font-size:10px; color:#64748b; display:block;">Deposit Held:</span>
+              <strong id="disputeModalAdvanceAmount" style="font-size:12px; color:#0f172a;">LKR 5,000</strong>
+            </div>
+            <span id="disputeModalTxnRef" style="font-size:9.5px; font-family:monospace; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">TXN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parties Contact Bar -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; background:#f1f5f9; padding:10px 12px; border-radius:8px; font-size:11.5px;">
+        <div>
+          <span style="color:#64748b; font-size:10px; font-weight:bold; display:block;">BUYER</span>
+          <strong id="disputeModalBuyerName">—</strong>
+          <div id="disputeModalBuyerContact" style="color:#475569; font-size:10.5px;">—</div>
+        </div>
+        <div>
+          <span style="color:#64748b; font-size:10px; font-weight:bold; display:block;">LISTING OWNER / AGENT</span>
+          <strong id="disputeModalOwnerName">—</strong>
+          <div id="disputeModalOwnerContact" style="color:#475569; font-size:10.5px;">—</div>
+        </div>
+      </div>
+
+      <!-- Complainant Full Statement / Evidence -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px; font-weight:bold; color:var(--ink); display:block; margin-bottom:5px;">
+          Complainant's Grievance & Investigation Notes:
+        </label>
+        <div id="disputeModalStatement" style="background:#fff; border:1px solid #cbd5e1; border-radius:8px; padding:12px; font-size:12px; line-height:1.5; color:#334155; max-height:110px; overflow-y:auto; font-style:italic;">
+          —
+        </div>
+      </div>
+
+      <!-- Past Resolution (if already resolved) -->
+      <div id="disputeModalPastResolutionBox" class="hidden" style="margin-bottom:16px; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:12px;">
+        <div style="font-size:11px; font-weight:800; color:#065f46; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+          <span>✓</span> Documented Resolution Record
+        </div>
+        <div style="font-size:12px; color:#14532d;">
+          Decision: <strong id="disputeModalPastDecision">—</strong> · Date: <span id="disputeModalPastDate">—</span>
+        </div>
+        <p id="disputeModalPastNotes" style="margin:4px 0 0; font-size:11.5px; color:#166534; font-style:italic;"></p>
+        <div id="disputeModalPastManager" style="font-size:10px; color:#15803d; margin-top:4px;">—</div>
+      </div>
+
+      <!-- Resolution Action Form (Step 3 & 3a) -->
+      <form id="disputeResolutionForm" style="display:grid; gap:14px;">
+        <input type="hidden" id="disputeBookingId" />
+
+        <div style="border-top:1px solid var(--line); padding-top:14px;">
+          <label style="font-size:11.5px; font-weight:bold; color:var(--ink); display:block; margin-bottom:6px;">
+            1. Select Documented Resolution Decision *
+          </label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:7px; cursor:pointer; font-size:11px;">
+              <input type="radio" name="disputeDecisionRadio" value="FULL_REFUND" checked />
+              <span><strong>🟢 Full Refund</strong> (100% - LKR 5,000)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:7px; cursor:pointer; font-size:11px;">
+              <input type="radio" name="disputeDecisionRadio" value="PARTIAL_REFUND" />
+              <span><strong>🟡 Partial Refund</strong> (50% - LKR 2,500)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #fed7aa; background:#fff7ed; border-radius:7px; cursor:pointer; font-size:11px;">
+              <input type="radio" name="disputeDecisionRadio" value="NO_REFUND" />
+              <span><strong>🔴 Forfeit Deposit</strong> (LKR 0 to Buyer)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #e9d5ff; background:#faf5ff; border-radius:7px; cursor:pointer; font-size:11px;">
+              <input type="radio" name="disputeDecisionRadio" value="RESCHEDULE" />
+              <span><strong>🔄 Mutual Reschedule</strong></span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:7px; cursor:pointer; font-size:11px;">
+              <input type="radio" name="disputeDecisionRadio" value="DISMISSED" />
+              <span><strong>⚪ Dismiss Dispute</strong></span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #fca5a5; background:#fef2f2; border-radius:7px; cursor:pointer; font-size:11px;">
+              <input type="radio" name="disputeDecisionRadio" value="ESCALATED_ADMIN" />
+              <span><strong>🚨 Escalate to Admin</strong></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Conditional Reschedule Date/Time Inputs -->
+        <div id="disputeRescheduleGroup" class="hidden" style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px; padding:10px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <label style="font-size:11px; font-weight:bold; color:#4c1d95;">New Agreed Viewing Date
+            <input type="date" id="disputeNewDate" style="width:100%; padding:7px; border:1px solid #c4b5fd; border-radius:5px; margin-top:3px;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:#4c1d95;">New Agreed Viewing Time
+            <input type="text" id="disputeNewTime" placeholder="e.g. 11:00 AM - 12:00 PM" style="width:100%; padding:7px; border:1px solid #c4b5fd; border-radius:5px; margin-top:3px;" />
+          </label>
+        </div>
+
+        <!-- Conditional Custom Refund Amount Input -->
+        <div id="disputeRefundAmountGroup" class="hidden" style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px;">
+          <label style="font-size:11px; font-weight:bold; color:#1e40af;">Custom Refund Amount (LKR)
+            <input type="number" id="disputeCustomRefund" value="2500" min="0" max="5000" step="100" style="width:100%; padding:7px; border:1px solid #93c5fd; border-radius:5px; margin-top:3px;" />
+          </label>
+        </div>
+
+        <!-- Documented Resolution Notes -->
+        <div>
+          <label style="font-size:11.5px; font-weight:bold; color:var(--ink); display:block; margin-bottom:4px;">
+            2. Documented Resolution Outcome & Manager's Justification *
+          </label>
+          <div style="display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap;">
+            <button type="button" class="dispute-preset-btn" data-text="Full refund approved to buyer due to confirmed absence of listing owner at scheduled appointment." style="font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">+ Absent Owner</button>
+            <button type="button" class="dispute-preset-btn" data-text="50% partial refund authorized per standard cancellation policy; viewing cancelled." style="font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">+ 50% Mutual Policy</button>
+            <button type="button" class="dispute-preset-btn" data-text="Buyer failed to attend viewing without prior notice; advance payment deposit forfeited." style="font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">+ Buyer No-Show</button>
+            <button type="button" class="dispute-preset-btn" data-text="Both parties contacted and mutually consented to reschedule the property viewing." style="font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">+ Mutual Reschedule</button>
+            <button type="button" class="dispute-preset-btn" data-text="Complaint reviewed and dismissed; both parties notified." style="font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">+ Dismiss Grievance</button>
+          </div>
+          <textarea id="disputeResolutionNotes" required rows="3" placeholder="Enter detailed reason and documented instructions for this resolution decision..." style="width:100%; padding:9px; border:1px solid var(--line); border-radius:7px; font-size:11.5px; font-family:Arial,sans-serif; box-sizing:border-box;"></textarea>
+        </div>
+
+        <!-- Dual Notification Notice -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:10px; font-size:11px; color:#475569;">
+          <input type="checkbox" id="disputeNotifyParties" checked style="width:16px; height:16px; cursor:pointer;" />
+          <label for="disputeNotifyParties" style="cursor:pointer; margin:0;">
+            <strong>Step 4 Dual Notification:</strong> Automatically send resolution notification and documented outcome to both Buyer and Listing Owner.
+          </label>
+        </div>
+
+        <p id="disputeModalMessage" class="message" style="margin:2px 0; font-size:11px; min-height:16px;"></p>
+
+        <div style="display:flex; justify-content:flex-end; gap:9px; margin-top:8px;">
+          <button type="button" class="secondary-button" id="cancelDisputeModalBtn">Close</button>
+          <button type="submit" id="submitDisputeResolutionBtn" class="primary-button" style="padding:9px 20px; background:#102a2c; color:white;">
+            ⚖️ Record Resolution Decision →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/bookingManager_page.js?v=20261007_1"></script>
+</body>
+</html>

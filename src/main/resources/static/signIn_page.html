@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in | Nook & Key</title>
+  <link rel="stylesheet" href="css/signin_page.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-layout">
+    <section class="auth-brand-panel">
+      <a href="index.html" class="logo">nook<span>&</span>key</a>
+      <div>
+        <p class="eyebrow">Good to see you again</p>
+        <h1>Welcome back to your next <em>chapter.</em></h1>
+        <p>Your shortlist, conversations, bookings, and apartment journey are waiting for you.</p>
+      </div>
+      <small>Homes, handled with heart.</small>
+    </section>
+
+    <section class="auth-form-panel">
+      <a href="index.html" class="back-link">← Back to home</a>
+      <div class="auth-form-container">
+        <p class="eyebrow">Sign in</p>
+        <h2>Sign in to Nook & Key</h2>
+        <p class="form-description">Access your saved homes and apartment activity.</p>
+
+        <form id="signinForm">
+          <label>Email address<input id="email" type="email" placeholder="you@example.com" required /></label>
+          <label>Password
+            <div style="position:relative; display:flex; align-items:center;">
+              <input id="password" type="password" placeholder="Enter your password" minlength="8" required style="padding-right:45px; width:100%;" />
+              <button type="button" id="togglePasswordBtn" style="position:absolute; right:12px; background:none; border:none; cursor:pointer; font-size:16px; color:#7a8681;" title="Show/Hide Password">👁️</button>
+            </div>
+          </label>
+          <div class="form-options">
+            <label class="checkbox-label"><input type="checkbox" /> Remember me</label>
+            <button type="button" id="forgotPassword">Forgot password?</button>
+          </div>
+          <button class="primary-button full-width" type="submit">Sign in →</button>
+        </form>
+
+        <p id="signinMessage" class="message"></p>
+        <p class="auth-switch">New to Nook & Key? <a href="signup_page.html">Create an account →</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="js/signin_page.js"></script>
+</body>
+</html>

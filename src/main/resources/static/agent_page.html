@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent workspace | Nook & Key</title>
+  <link rel="stylesheet" href="css/agent_page.css" />
+  <link rel="stylesheet" href="css/paddle_billing.css" />
+  <style>
+    .hidden { display: none !important; }
+    .modal {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; justify-content: center; align-items: flex-start;
+      padding: 30px 16px 60px; background: rgba(16,42,44,0.68);
+      backdrop-filter: blur(4px);
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    .modal-card {
+      position: relative; width: min(100%, 600px);
+      margin: 20px auto 40px; padding: 32px 28px 36px;
+      border-radius: 14px; background: var(--paper, #fffdf9);
+      box-shadow: 0 25px 60px rgba(16,42,44,0.35);
+    }
+    .modal::-webkit-scrollbar { width: 8px; }
+    .modal::-webkit-scrollbar-track { background: rgba(16,42,44,0.15); border-radius: 8px; }
+    .modal::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 8px; }
+    .modal::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    .modal-card .close-button {
+      position: absolute; top: 16px; right: 18px;
+      z-index: 20; border: 1px solid #e2e8f0; color: var(--muted, #7b8882);
+      background: #ffffff;
+      border-radius: 50%; width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      transition: all .15s ease;
+    }
+    .modal-card .close-button:hover { color: #dc2626; background: #fee2e2; border-color: #fecaca; transform: scale(1.05); }
+    .profile-modal-overlay {
+      position: fixed; inset: 0; background: rgba(16,42,44,0.4);
+      backdrop-filter: blur(4px); display: flex; align-items: center;
+      justify-content: center; z-index: 1000;
+    }
+    .profile-modal-card {
+      background: white; border-radius: 12px; padding: 28px;
+      max-width: 420px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      position: relative; animation: fadeIn .2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <a href="index.html" class="logo">nook<span>&</span>key</a>
+    <div class="workspace-label">Agent workspace</div>
+    <nav class="side-nav">
+      <a href="#overview" class="active">▦ <span>Overview</span></a>
+      <a href="#listings">⌂ <span>My listings</span><b id="navListingCount">0</b></a>
+      <a href="#marketplace" id="navMarketplaceLink">🌐 <span>Site Apartments</span><b id="navMarketplaceCount">0</b></a>
+      <a href="#upcomingBookings">📅 <span>Upcoming viewings</span><b id="navUpcomingCount">0</b></a>
+      <a href="#leads">◌ <span>Leads & inquiries</span><b>0</b></a>
+      <a href="#messages">✉ <span>Messages</span><b>0</b></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="index.html">↩ <span>Back to website</span></a>
+      <button id="logoutButton">⇥ <span>Sign out</span></button>
+    </div>
+  </aside>
+
+  <main class="dashboard-main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="todayDate">Today</p>
+        <h1 id="greetingHeading">Good morning, <em id="userFirstName">there.</em></h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="openBillingBtn" class="primary-button" style="padding:6px 14px; font-size:11px; display:inline-flex; align-items:center; gap:6px; background:#102a2c; color:white; border-radius:20px; border:1px solid #334e50;" title="Manage Subscription & Listing Quota">
+          <span id="currentPlanLabel">⚡ Free Plan</span>
+          <span style="background:#e8785a; color:white; font-size:9px; padding:1px 6px; border-radius:10px; font-weight:bold;">UPGRADE</span>
+        </button>
+        <button class="icon-button" onclick="document.getElementById('listingSearch').focus()">⌕</button>
+        <button class="notification-button" id="agentNotifBtn" title="Notifications" style="position:relative;">
+          ◔<span id="agentNotifBadge" class="hidden" style="position:absolute; top:-3px; right:-3px; background:#e8785a; color:white; border-radius:50%; font-size:9px; width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; font-weight:bold;">0</span>
+        </button>
+        <div class="profile-chip" id="profileChip" style="cursor:pointer;" title="View your profile">
+          <span class="avatar" id="userAvatar">A</span>
+          <span>
+            <strong id="userFullName" style="display:flex; align-items:center; gap:5px;">Real Estate Agent <span id="verifiedBadge" class="badge-unverified" style="cursor:pointer;" onclick="window.openPaddleModal && window.openPaddleModal()" title="Upgrade to Pro or Elite to get Verified">⚡ Unverified</span></strong>
+            <small id="userRoleBadge">Property agent</small>
+          </span>
+          <span>⌄</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Listing Quota & Subscription Widget -->
+    <div class="quota-card" id="quotaWidget" style="background:white; border:1px solid var(--line); border-radius:12px; padding:16px 20px; box-shadow:0 2px 12px rgba(16,42,44,0.04); margin-bottom:22px;">
+      <div class="quota-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:16px;">▤</span>
+          <strong style="font-size:13.5px; color:var(--ink);">Listing Portfolio Quota</strong>
+          <span id="quotaPlanPill" class="badge-plan-pill plan-FREE" style="padding:3px 10px; border-radius:12px; font-size:10px; font-weight:800;">FREE PLAN</span>
+          <span id="quotaSlotsRemainingBadge" style="background:#f1f5f9; color:#475569; font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:10px; border:1px solid #cbd5e1;">2 slots remaining</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="btn-quota-upgrade" id="widgetUpgradeBtn" style="background:#e8785a; color:white; border:none; padding:7px 14px; font-size:11px; font-weight:bold; border-radius:6px; cursor:pointer;">⚡ Upgrade via Paddle</button>
+        </div>
+      </div>
+      <div class="quota-bar-container" style="height:10px; background:#e2e8f0; border-radius:6px; overflow:hidden; position:relative;">
+        <div id="quotaBarFill" class="quota-bar-fill" style="height:100%; border-radius:6px; background:linear-gradient(90deg, #10b981, #059669); transition:width 0.5s ease; width:0%;"></div>
+      </div>
+      <div class="quota-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:11px;">
+        <span id="quotaUsageText" style="color:var(--ink);">Active listings: <strong>0 / 2</strong> slots used</span>
+        <span id="quotaLimitText" style="color:#64748b;">Upgrade to Pro for 10 listings or Elite for unlimited</span>
+      </div>
+    </div>
+
+    <section id="overview" class="stats-grid">
+      <article class="stat-card featured">
+        <div class="stat-top">
+          <span>Active listings</span>
+          <span class="stat-icon">⌂</span>
+        </div>
+        <strong id="activeCount">0</strong>
+        <p id="listingSummaryText"><b>0 listings</b> in portfolio</p>
+        <div class="sparkline"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-top">
+          <span>Inquiries</span>
+          <span class="stat-icon orange">◌</span>
+        </div>
+        <strong>0</strong>
+        <p><b>Client leads</b></p>
+        <div class="stat-bar"><span style="width:0%"></span></div>
+      </article>
+      <article class="stat-card" style="cursor:pointer;" onclick="location.hash='#upcomingBookings'">
+        <div class="stat-top">
+          <span>Upcoming viewings</span>
+          <span class="stat-icon green">📅</span>
+        </div>
+        <strong id="agentUpcomingCount">0</strong>
+        <p><b>Scheduled appointments</b></p>
+        <div class="stat-bar green-bar"><span style="width:0%"></span></div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-top">
+          <span>License Status</span>
+          <span class="stat-icon purple">✓</span>
+        </div>
+        <strong id="agentLicenseStatus">Verified</strong>
+        <p><b id="agentLicenseSub">Certified agent</b></p>
+        <div class="stat-bar purple-bar"><span style="width:100%"></span></div>
+      </article>
+    </section>
+
+    <section id="listings" class="content-card listing-section">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Your portfolio</p>
+          <h2>Apartment listings</h2>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" id="refreshListings">↻ Refresh</button>
+          <button class="primary-button" id="openAddListing">+ Add listing</button>
+        </div>
+      </div>
+      <div class="listing-toolbar" style="display:flex; gap:9px; align-items:flex-start; margin:25px 0 14px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px; display:flex; flex-direction:column; gap:4px;">
+          <div class="search-input" id="searchContainer" style="display:flex; align-items:center; gap:8px; padding:0 12px; border:1px solid var(--line); border-radius:7px; color:var(--muted); font-size:16px; background:white; transition:border-color .2s, box-shadow .2s;">
+            <span>⌕</span>
+            <input id="listingSearch" type="search" placeholder="Search by property or location..." style="width:100%; padding:10px 0; border:0; outline:0; color:var(--ink); font-size:11px;" />
+            <button type="button" id="clearSearchBtn" style="display:none; border:none; background:transparent; color:#94a3b8; font-size:15px; cursor:pointer; padding:0 4px;" title="Clear search">✕</button>
+          </div>
+          <div id="searchValidationError" style="display:none; align-items:center; gap:5px; color:#dc2626; font-size:11px; font-weight:600; padding:2px 4px;">
+            <span>⚠️</span>
+            <span id="searchValidationText">Please enter a search term (e.g. property name or city) before searching.</span>
+          </div>
+        </div>
+        <button type="button" id="searchBtn" class="primary-button" style="padding:10px 18px; font-size:11px; height:38px; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-radius:7px;">
+          <span>🔍</span> Search
+        </button>
+        <select id="statusFilter" style="height:38px;">
+          <option value="ALL">All statuses</option>
+          <option value="PUBLISHED">Published</option>
+          <option value="PENDING">Pending review</option>
+          <option value="DRAFT">Draft</option>
+          <option value="SOLD">Sold</option>
+        </select>
+        <button class="filter-button" style="height:38px;">☷ Filters</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Seller</th>
+              <th>Price</th>
+              <th>Inquiries</th>
+              <th>Status</th>
+              <th>Updated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="listingTableBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state">No listings match your search. Click "+ Add listing" to create one.</div>
+    </section>
+
+    <!-- Explore All Site Apartments (Marketplace) -->
+    <section id="marketplace" class="content-card" style="margin-top:24px;">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Live on Nook & Key</p>
+          <h2>All Published Apartments on Site</h2>
+          <p style="margin:4px 0 0; font-size:12px; color:#64748b;">
+            Browse active listings published across the platform. Inspect photos, amenities, pricing, and agent credentials just like a buyer.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" id="refreshMarketplaceBtn">↻ Refresh</button>
+        </div>
+      </div>
+
+      <!-- Marketplace Filter / Search Toolbar -->
+      <div style="display:flex; gap:10px; align-items:center; margin:20px 0 16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px; display:flex; align-items:center; gap:8px; padding:0 12px; border:1px solid var(--line); border-radius:7px; background:white;">
+          <span style="color:var(--muted);">⌕</span>
+          <input id="marketplaceSearch" type="search" placeholder="Search site apartments by title, city, or agent..." style="width:100%; padding:9px 0; border:0; outline:0; font-size:11px; color:var(--ink);" />
+        </div>
+        <select id="marketplaceCityFilter" style="height:38px; border:1px solid var(--line); border-radius:7px; padding:0 10px; font-size:11px; background:white; color:var(--ink);">
+          <option value="ALL">All Cities</option>
+        </select>
+        <span id="marketplaceResultsCount" style="font-size:11px; font-weight:700; color:var(--muted); margin-left:auto;">Showing 0 apartments</span>
+      </div>
+
+      <!-- Marketplace Apartments Grid -->
+      <div id="marketplaceGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:18px; margin-top:14px;">
+        <!-- Dynamically rendered apartment cards -->
+      </div>
+      <div id="marketplaceEmptyState" class="empty-state hidden">
+        No published apartments found on the platform matching your criteria.
+      </div>
+    </section>
+
+    <!-- Upcoming Viewing Bookings Section -->
+    <section id="upcomingBookings" class="content-card" style="margin-top:22px;">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Client schedule</p>
+          <h2>Upcoming Viewing Bookings</h2>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" id="refreshBookingsBtn">↻ Refresh Bookings</button>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Buyer details</th>
+              <th>Viewing schedule</th>
+              <th>Advance deposit</th>
+              <th>Booking status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTableBody"></tbody>
+        </table>
+      </div>
+      <div id="bookingsEmptyState" class="empty-state">
+        <span style="font-size:24px; display:block; margin-bottom:6px;">📅</span>
+        No upcoming viewing bookings yet. When buyers book viewings for your portfolio, they will appear here with scheduled dates and advance deposits.
+      </div>
+    </section>
+
+    <div class="lower-grid">
+      <section id="leads" class="content-card">
+        <div class="section-header compact">
+          <div>
+            <p class="eyebrow">Keep things moving</p>
+            <h2>Latest inquiries</h2>
+          </div>
+          <a href="#leads">View all →</a>
+        </div>
+        <div class="lead-list">
+          <p style="padding:15px 0;color:#7a8681;font-size:13px;">No buyer leads yet. Inquiries from prospective buyers will appear here.</p>
+        </div>
+      </section>
+
+      <section id="viewings" class="content-card">
+        <div class="section-header compact">
+          <div>
+            <p class="eyebrow">Your calendar</p>
+            <h2>Today’s viewings</h2>
+          </div>
+          <a href="#viewings">Calendar →</a>
+        </div>
+        <div class="viewing-list">
+          <p style="padding:15px 0;color:#7a8681;font-size:13px;">No viewings scheduled for today.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Add Listing Modal -->
+  <div id="listingModal" class="modal hidden">
+    <div class="modal-card">
+      <button class="close-button" id="closeListingModal">×</button>
+      <p class="eyebrow">New apartment listing</p>
+      <h2>Add a listing</h2>
+      <p class="modal-description">Create a draft and send it to verification when the details are ready.</p>
+      <form id="listingForm">
+        <label>Property name
+          <input id="propertyName" required placeholder="e.g. The Fern House" />
+        </label>
+        <div class="form-row">
+          <label>Street
+            <input id="propertyStreet" required placeholder="e.g. 12 Flower Road" />
+          </label>
+          <label>City
+            <input id="propertyCity" required placeholder="e.g. Colombo 07" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Postal code
+            <input id="propertyPostalCode" required placeholder="e.g. 00700" />
+          </label>
+          <label>Price (LKR)
+            <input id="propertyPrice" required placeholder="e.g. 48500000 or 48.5M" />
+          </label>
+        </div>
+        <label>Property type
+          <select id="propertyType">
+            <option value="APARTMENT">Apartment</option>
+            <option value="PENTHOUSE">Penthouse</option>
+            <option value="STUDIO">Studio</option>
+          </select>
+        </label>
+        <label>Seller email (optional)
+          <input id="sellerEmail" type="email" placeholder="seller@example.com" />
+        </label>
+        <label>Description
+          <textarea id="propertyDescription" rows="3" placeholder="Describe the apartment layout, amenities, and features..."></textarea>
+        </label>
+
+        <!-- Apartment Amenities Section (Dynamic from Database) -->
+        <div style="margin: 14px 0; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:13px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12px; font-weight:bold; color:#102a2c; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>✦</span> Apartment Amenities & Features
+            </label>
+            <span style="font-size:9.5px; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Platform Catalog</span>
+          </div>
+          <p style="font-size:11px; color:#64748b; margin:0 0 10px; line-height:1.4;">
+            Select all features available in this apartment. Buyers will see these verified amenities on your listing.
+          </p>
+          <div id="listingAmenityCheckboxes" style="display:flex; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:11px; color:#94a3b8;">Loading available amenities...</span>
+          </div>
+        </div>
+
+        <!-- Apartment Image / Cover Photo Section -->
+        <div style="margin: 14px 0; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:13px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <label style="font-size:12px; font-weight:bold; color:#102a2c; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>🖼️</span> Apartment Cover Photo
+            </label>
+            <span style="font-size:9.5px; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Web URL or Device Upload</span>
+          </div>
+          <p style="font-size:11px; color:#64748b; margin:0 0 10px; line-height:1.4;">
+            Paste an image URL (e.g. Unsplash or web link) or upload a photo directly from your device.
+          </p>
+
+          <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center;">
+            <input type="text" id="propertyImageUrl" placeholder="https://images.unsplash.com/... or upload photo" style="padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:11px; background:white; width:100%; box-sizing:border-box;" />
+            <label class="secondary-button" style="display:inline-flex; align-items:center; gap:5px; padding:8px 12px; font-size:11px; cursor:pointer; margin:0; border-radius:6px; font-weight:bold; background:white; white-space:nowrap; border:1px solid #cbd5e1;">
+              <span>📁 Upload Photo</span>
+              <input type="file" id="propertyImageFileInput" accept="image/*" style="display:none;" />
+            </label>
+          </div>
+
+          <div id="imageUploadProgress" class="hidden" style="margin-top:8px; padding:6px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; font-size:11px; color:#1e40af; display:flex; align-items:center; gap:6px;">
+            <span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span>
+            <span id="imageUploadProgressText">Uploading photo to server...</span>
+          </div>
+
+          <!-- Live Image Preview Box -->
+          <div id="propertyImagePreviewWrap" style="margin-top:10px; display:flex; align-items:center; gap:12px; background:white; padding:8px; border-radius:6px; border:1px solid #e2e8f0;">
+            <img id="propertyImagePreview" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=160&q=80" alt="Preview" style="width:72px; height:50px; object-fit:cover; border-radius:5px; border:1px solid #cbd5e1;" />
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span id="imageStatusBadge" style="font-size:9.5px; font-weight:bold; color:#047857; background:#ecfdf5; padding:2px 6px; border-radius:4px; border:1px solid #a7f3d0;">Default Preview</span>
+                <button type="button" id="clearImageBtn" style="display:none; border:none; background:transparent; color:#dc2626; font-size:10.5px; font-weight:600; cursor:pointer; padding:0;">Remove custom photo</button>
+              </div>
+              <span id="imagePreviewHint" style="display:block; font-size:10px; color:#64748b; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Default modern apartment image active.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick jump indicator to make it crystal clear to users that legal documents are below -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 10px 0 14px; padding: 8px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+          <span style="font-size: 11px; color: #166534; font-weight: 600; display:flex; align-items:center; gap:6px;">
+            <span>⬇️</span> Scroll down to upload required legal documents & submit listing
+          </span>
+          <button type="button" onclick="document.getElementById('docSectionWrap')?.scrollIntoView({behavior:'smooth', block:'start'});" style="font-size: 11px; color: #047857; font-weight: 700; background: white; border: 1px solid #86efac; border-radius: 6px; padding: 4px 10px; cursor: pointer; display: flex; align-items: center; gap: 4px;">Jump to Documents ↓</button>
+        </div>
+
+        <!-- Apartment Legal Documents Submission Section (5 Dedicated Upload Boxes) -->
+        <div id="docSectionWrap" style="margin: 16px 0; background:#faf8f5; border:1px solid #ded8cc; border-radius:8px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12.5px; font-weight:bold; color:#102a2c; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>📜</span> Apartment Legal Documents
+            </label>
+            <span style="font-size:10px; color:#b91c1c; font-weight:bold; background:#fee2e2; padding:2px 8px; border-radius:12px;">Mandatory for Verification</span>
+          </div>
+          <p style="font-size:11px; color:#7a8681; margin:0 0 12px; line-height:1.4;">
+            Please attach the required legal documents below. Our Verification Officer will inspect each document before your apartment is published.
+          </p>
+
+          <!-- 5 Dedicated Document Upload Boxes -->
+          <div style="display:grid; gap:8px;">
+
+            <!-- 1. Title Deed -->
+            <div class="doc-box" id="docBox_TITLE_DEED" style="background:white; border:1px solid #ded8cc; border-radius:8px; padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="min-width:0; flex:1;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span style="font-size:15px;">📜</span>
+                  <strong style="font-size:11.5px; color:#102a2c;">Deed of Transfer / Title Deed</strong>
+                  <span style="font-size:9px; font-weight:800; color:#b91c1c; background:#fee2e2; padding:1.5px 6px; border-radius:8px;">REQUIRED *</span>
+                </div>
+                <div class="doc-file-status" id="docStatus_TITLE_DEED" style="font-size:10.5px; color:#94a3b8; margin-top:2px;">
+                  No file attached yet
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <label class="secondary-button doc-upload-label" id="docLabel_TITLE_DEED" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:10.5px; cursor:pointer; margin:0; border-radius:6px; font-weight:bold; background:#f8fafc; border:1px solid #cbd5e1;">
+                  <span>📎 Attach</span>
+                  <input type="file" class="doc-box-input" data-doctype="TITLE_DEED" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none;" />
+                </label>
+                <button type="button" class="doc-remove-btn hidden" data-doctype="TITLE_DEED" style="border:none; background:transparent; color:#dc2626; font-size:14px; cursor:pointer; padding:2px 4px; font-weight:bold;" title="Remove this document">✕</button>
+              </div>
+            </div>
+
+            <!-- 2. COC -->
+            <div class="doc-box" id="docBox_COC" style="background:white; border:1px solid #ded8cc; border-radius:8px; padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="min-width:0; flex:1;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span style="font-size:15px;">🏛️</span>
+                  <strong style="font-size:11.5px; color:#102a2c;">Certificate of Conformity (COC)</strong>
+                  <span style="font-size:9px; font-weight:800; color:#0369a1; background:#e0f2fe; padding:1.5px 6px; border-radius:8px;">RECOMMENDED</span>
+                </div>
+                <div class="doc-file-status" id="docStatus_COC" style="font-size:10.5px; color:#94a3b8; margin-top:2px;">
+                  No file attached yet
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <label class="secondary-button doc-upload-label" id="docLabel_COC" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:10.5px; cursor:pointer; margin:0; border-radius:6px; font-weight:bold; background:#f8fafc; border:1px solid #cbd5e1;">
+                  <span>📎 Attach</span>
+                  <input type="file" class="doc-box-input" data-doctype="COC" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none;" />
+                </label>
+                <button type="button" class="doc-remove-btn hidden" data-doctype="COC" style="border:none; background:transparent; color:#dc2626; font-size:14px; cursor:pointer; padding:2px 4px; font-weight:bold;" title="Remove this document">✕</button>
+              </div>
+            </div>
+
+            <!-- 3. Approved Building / Floor Plan -->
+            <div class="doc-box" id="docBox_BUILDING_PLAN" style="background:white; border:1px solid #ded8cc; border-radius:8px; padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="min-width:0; flex:1;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span style="font-size:15px;">📐</span>
+                  <strong style="font-size:11.5px; color:#102a2c;">Approved Building / Floor Plan</strong>
+                  <span style="font-size:9px; font-weight:800; color:#b45309; background:#fef3c7; padding:1.5px 6px; border-radius:8px;">RECOMMENDED</span>
+                </div>
+                <div class="doc-file-status" id="docStatus_BUILDING_PLAN" style="font-size:10.5px; color:#94a3b8; margin-top:2px;">
+                  No file attached yet
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <label class="secondary-button doc-upload-label" id="docLabel_BUILDING_PLAN" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:10.5px; cursor:pointer; margin:0; border-radius:6px; font-weight:bold; background:#f8fafc; border:1px solid #cbd5e1;">
+                  <span>📎 Attach</span>
+                  <input type="file" class="doc-box-input" data-doctype="BUILDING_PLAN" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none;" />
+                </label>
+                <button type="button" class="doc-remove-btn hidden" data-doctype="BUILDING_PLAN" style="border:none; background:transparent; color:#dc2626; font-size:14px; cursor:pointer; padding:2px 4px; font-weight:bold;" title="Remove this document">✕</button>
+              </div>
+            </div>
+
+            <!-- 4. Local Authority Assessment & Rates -->
+            <div class="doc-box" id="docBox_RATES_TAX" style="background:white; border:1px solid #ded8cc; border-radius:8px; padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="min-width:0; flex:1;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span style="font-size:15px;">🧾</span>
+                  <strong style="font-size:11.5px; color:#102a2c;">Local Authority Assessment & Rates</strong>
+                  <span style="font-size:9px; font-weight:800; color:#6b21a8; background:#f3e8ff; padding:1.5px 6px; border-radius:8px;">OPTIONAL</span>
+                </div>
+                <div class="doc-file-status" id="docStatus_RATES_TAX" style="font-size:10.5px; color:#94a3b8; margin-top:2px;">
+                  No file attached yet
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <label class="secondary-button doc-upload-label" id="docLabel_RATES_TAX" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:10.5px; cursor:pointer; margin:0; border-radius:6px; font-weight:bold; background:#f8fafc; border:1px solid #cbd5e1;">
+                  <span>📎 Attach</span>
+                  <input type="file" class="doc-box-input" data-doctype="RATES_TAX" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none;" />
+                </label>
+                <button type="button" class="doc-remove-btn hidden" data-doctype="RATES_TAX" style="border:none; background:transparent; color:#dc2626; font-size:14px; cursor:pointer; padding:2px 4px; font-weight:bold;" title="Remove this document">✕</button>
+              </div>
+            </div>
+
+            <!-- 5. Seller National Identity (NIC / Passport) -->
+            <div class="doc-box" id="docBox_SELLER_NIC" style="background:white; border:1px solid #ded8cc; border-radius:8px; padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="min-width:0; flex:1;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span style="font-size:15px;">🆔</span>
+                  <strong style="font-size:11.5px; color:#102a2c;">Seller National Identity (NIC / Passport)</strong>
+                  <span style="font-size:9px; font-weight:800; color:#b91c1c; background:#fee2e2; padding:1.5px 6px; border-radius:8px;">REQUIRED *</span>
+                </div>
+                <div class="doc-file-status" id="docStatus_SELLER_NIC" style="font-size:10.5px; color:#94a3b8; margin-top:2px;">
+                  No file attached yet
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <label class="secondary-button doc-upload-label" id="docLabel_SELLER_NIC" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:10.5px; cursor:pointer; margin:0; border-radius:6px; font-weight:bold; background:#f8fafc; border:1px solid #cbd5e1;">
+                  <span>📎 Attach</span>
+                  <input type="file" class="doc-box-input" data-doctype="SELLER_NIC" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none;" />
+                </label>
+                <button type="button" class="doc-remove-btn hidden" data-doctype="SELLER_NIC" style="border:none; background:transparent; color:#dc2626; font-size:14px; cursor:pointer; padding:2px 4px; font-weight:bold;" title="Remove this document">✕</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Document Upload Progress Indicator -->
+          <div id="docUploadProgress" class="hidden" style="margin-top:10px; padding:8px 12px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; font-size:11px; color:#1e40af; display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span>
+            <span id="docUploadProgressText">Uploading document to verification server...</span>
+          </div>
+
+          <!-- Documents Checklist Validation Status Banner -->
+          <div id="docValidationStatus" style="margin-top:12px; padding:9px 12px; border-radius:6px; font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c;">
+            <span>⚠️</span>
+            <span id="docValidationStatusText">Mandatory documents missing: Please attach your Title Deed and Seller NIC/Passport to enable submission.</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-button" id="cancelListing">Cancel</button>
+          <button type="submit" class="primary-button" id="submitListingBtn" disabled style="opacity:0.55; cursor:not-allowed;" title="Attach required documents to enable submission">Submit for Verification →</button>
+        </div>
+      </form>
+      <p id="formMessage" class="message"></p>
+    </div>
+  </div>
+
+  <!-- Verification Submission Success Modal (Lassna confirmation experience) -->
+  <div id="submissionSuccessModal" class="profile-modal-overlay hidden" style="z-index: 1200;">
+    <div class="profile-modal-card" style="max-width: 540px; padding: 32px 28px; text-align: center; border-radius: 16px; border: 1px solid #d1fae5; box-shadow: 0 25px 50px -12px rgba(16, 42, 44, 0.25);">
+      <div style="width: 68px; height: 68px; margin: 0 auto 16px; border-radius: 50%; background: #ecfdf5; border: 2px solid #a7f3d0; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 0 8px #f0fdf4;">
+        🛡️
+      </div>
+      <p class="eyebrow" style="color: #059669; font-weight: 800; font-size: 11px; margin-bottom: 6px; letter-spacing: 1.5px;">SUBMISSION RECEIVED</p>
+      <h2 style="margin: 0 0 8px; font-size: 24px; color: #102a2c; font-family: Georgia, serif;">Listing Submitted for Verification!</h2>
+      <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin: 0 0 20px;">
+        Your apartment and legal documents have been successfully queued for inspection by our Verification Officer.
+      </p>
+
+      <!-- Property Summary Card inside Modal -->
+      <div style="background: #faf8f5; border: 1px solid #ded8cc; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+          <div>
+            <h4 id="successModalPropertyTitle" style="margin: 0; font-size: 15px; color: #102a2c; font-weight: bold;">Apartment Title</h4>
+            <p id="successModalPropertyLocation" style="margin: 2px 0 0; font-size: 11.5px; color: #7a8681;">Location</p>
+          </div>
+          <span style="display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; background: #fff1d8; color: #a66b24; border: 1px solid #fde68a;">
+            ⏳ Pending Review
+          </span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #ded8cc; padding-top: 10px; margin-top: 10px; font-size: 11.5px;">
+          <span style="color: #7a8681;">Asking Price:</span>
+          <strong id="successModalPropertyPrice" style="color: #102a2c; font-size: 13.5px;">LKR 0</strong>
+        </div>
+        <div style="border-top: 1px dashed #ded8cc; padding-top: 10px; margin-top: 10px; font-size: 11.5px;">
+          <span style="color: #7a8681; display: block; margin-bottom: 6px;">Attached Legal Documents:</span>
+          <div id="successModalDocumentsList" style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <!-- Document chips rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Step Verification Pipeline -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-align: left; margin-bottom: 22px;">
+        <div style="font-size: 11px; font-weight: bold; color: #102a2c; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+          What Happens Next?
+        </div>
+        <div style="display: grid; gap: 10px;">
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: #dbeafe; color: #1e40af; font-size: 10.5px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span>
+            <div style="font-size: 11.5px; color: #475569;">
+              <strong style="color: #1e293b;">Legal Review</strong>: Verification Officer inspects Deed of Transfer, COC, and approved plans.
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: #fef3c7; color: #92400e; font-size: 10.5px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span>
+            <div style="font-size: 11.5px; color: #475569;">
+              <strong style="color: #1e293b;">Compliance Verification</strong>: Title authenticity confirmed under Sri Lankan condominium laws.
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: #dcfce7; color: #15803d; font-size: 10.5px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span>
+            <div style="font-size: 11.5px; color: #475569;">
+              <strong style="color: #1e293b;">Automatic Marketplace Launch</strong>: Upon approval, your apartment immediately goes live to buyers.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="closeSubmissionSuccessModalBtn" class="primary-button" style="padding: 10px 24px; font-size: 12px; background: #e8785a; border-radius: 8px; font-weight: bold; cursor: pointer;">
+          ✓ View in My Properties
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Additional Documents Modal (When officer requests more documents) -->
+  <div id="uploadMoreDocsModal" class="profile-modal-overlay hidden">
+    <div class="profile-modal-card" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
+      <button id="closeUploadMoreDocsModal" style="position:absolute;top:16px;right:16px;border:none;background:transparent;font-size:22px;cursor:pointer;color:#7a8681;">×</button>
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:12px;">
+        <span style="font-size:26px; line-height:1;">📤</span>
+        <div>
+          <h3 id="moreDocsListingTitle" style="margin:0; font-size:17px; color:#102a2c;">Upload Requested Documents</h3>
+          <p id="moreDocsOfficerNote" style="margin:6px 0 0; font-size:11.5px; color:#b45309; background:#fffbeb; padding:8px 12px; border-radius:6px; border:1px solid #fde68a; line-height:1.4;">
+            Officer Note: Please upload the required documents.
+          </p>
+        </div>
+      </div>
+
+      <form id="uploadMoreDocsForm" style="display:grid; gap:12px; margin-top:14px;">
+        <input type="hidden" id="moreDocsListingId" value="" />
+        <label style="font-size:11px; font-weight:bold; color:#102a2c;">Document Type *
+          <select id="moreDocsTypeSelect" required style="width:100%; padding:9px 10px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; font-size:11.5px; background:white; box-sizing:border-box;">
+            <option value="TITLE_DEED">📜 Deed of Transfer / Title Deed</option>
+            <option value="COC">🏛️ Certificate of Conformity (COC)</option>
+            <option value="BUILDING_PLAN">📐 Approved Building / Floor Plan</option>
+            <option value="RATES_TAX">🧾 Local Authority Assessment & Rates</option>
+            <option value="SELLER_NIC">🆔 Seller National Identity (NIC / Passport)</option>
+            <option value="OTHER">📄 Other Supporting Document</option>
+          </select>
+        </label>
+        <label style="font-size:11px; font-weight:bold; color:#102a2c;">Select Document File (PDF, PNG, JPG) *
+          <input type="file" id="moreDocsFileInput" required accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="width:100%; padding:9px; margin-top:4px; border:1px dashed #ded8cc; border-radius:6px; font-size:11.5px; background:#fffdfa; box-sizing:border-box;" />
+        </label>
+        <p id="moreDocsMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button type="button" id="cancelUploadMoreDocsBtn" class="secondary-button">Cancel</button>
+          <button type="submit" id="submitMoreDocsBtn" class="primary-button" style="background:#e8785a; padding:9px 20px;">Upload & Resubmit →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notifications Modal -->
+  <div id="agentNotifModal" class="profile-modal-overlay hidden">
+    <div class="profile-modal-card" style="max-width: 520px; max-height: 80vh; overflow-y: auto;">
+      <button id="closeAgentNotifModal" style="position:absolute;top:16px;right:16px;border:none;background:transparent;font-size:22px;cursor:pointer;color:#7a8681;">×</button>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h3 style="margin:0; font-size:18px; color:#102a2c;">Agent Notifications</h3>
+        <button id="refreshAgentNotifsBtn" style="border:none; background:transparent; color:#c85b47; cursor:pointer; font-size:12px; font-weight:bold;">↻ Refresh</button>
+      </div>
+      <div id="agentNotifList" style="display:grid; gap:10px; max-height:350px; overflow-y:auto;">
+        <p style="color:#7a8681; font-size:13px;">Loading notifications...</p>
+      </div>
+      <div style="margin-top:20px; text-align:right;">
+        <button id="closeAgentNotifModalBtn" style="padding:8px 16px; border:1px solid #ded8cc; background:white; border-radius:7px; cursor:pointer; font-size:12px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Details & Edit Modal -->
+  <div id="profileModal" class="profile-modal-overlay hidden">
+    <div class="profile-modal-card" style="max-width: 480px; max-height: 90vh; overflow-y: auto;">
+      <button id="closeProfileModal" style="position:absolute;top:16px;right:16px;border:none;background:transparent;font-size:22px;cursor:pointer;color:#7a8681;">×</button>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <span class="avatar" id="modalAvatar" style="width:52px;height:52px;border-radius:50%;background:#102a2c;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;">A</span>
+        <div>
+          <h3 id="modalFullName" style="margin:0;font-size:18px;color:#102a2c;">Agent</h3>
+          <p id="modalRole" style="margin:4px 0 0;font-size:13px;color:#7a8681;">Licensed Real Estate Agent · <span style="color:#2e7d32;font-weight:bold;">ACTIVE</span></p>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div style="display:flex; border-bottom:1px solid #ded8cc; margin-bottom:16px; gap:8px;">
+        <button type="button" id="tabAgentProfileInfo" style="padding:8px 16px; border:none; background:transparent; font-size:12px; font-weight:700; color:#102a2c; border-bottom:2px solid #e8785a; cursor:pointer;">Personal Info & Plan</button>
+        <button type="button" id="tabAgentPassword" style="padding:8px 16px; border:none; background:transparent; font-size:12px; font-weight:700; color:#7a8681; border-bottom:2px solid transparent; cursor:pointer;">Change Password 🔐</button>
+      </div>
+
+      <!-- Tab 1: Profile Details & Subscription -->
+      <div id="tabAgentContentProfile">
+        <form id="updateProfileForm" style="display:grid; gap:12px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <label style="font-size:11px; font-weight:bold; color:#102a2c;">First Name *
+              <input type="text" id="editFirstName" required style="width:100%; padding:8px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+            </label>
+            <label style="font-size:11px; font-weight:bold; color:#102a2c;">Last Name *
+              <input type="text" id="editLastName" required style="width:100%; padding:8px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+            </label>
+          </div>
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:10px;">
+            <label style="font-size:11px; font-weight:bold; color:#102a2c;">Email (Read-Only)
+              <input type="email" id="editEmail" disabled style="width:100%; padding:8px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; background:#f5f5f5; color:#7a8681; box-sizing:border-box;" />
+            </label>
+            <label style="font-size:11px; font-weight:bold; color:#102a2c;">License Number
+              <input type="text" id="editLicense" placeholder="REA-2026-XXXX" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+            </label>
+          </div>
+          <label style="font-size:11px; font-weight:bold; color:#102a2c;">Phone Number
+            <input type="tel" id="editPhone" placeholder="+94 77 123 4567" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+          </label>
+          
+          <!-- Subscription / Plan Management -->
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+            <div>
+              <strong style="font-size:12px; color:#102a2c; display:block;">Subscription & Quota</strong>
+              <span id="profilePlanDesc" style="font-size:11px; color:#64748b;">Free Plan · Max 2 active listings</span>
+            </div>
+            <button type="button" id="profileChangePlanBtn" style="padding:6px 14px; font-size:11px; font-weight:bold; background:#102a2c; color:white; border:none; border-radius:6px; cursor:pointer;">
+              Manage Plan →
+            </button>
+          </div>
+
+          <p id="profileMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <button type="button" id="modalLogoutButton" style="padding:9px 16px; border:none; background:#c85b47; color:white; border-radius:7px; cursor:pointer; font-size:12px; font-weight:bold;">Sign out</button>
+            <button type="submit" id="saveProfileBtn" class="primary-button" style="padding:9px 20px; border:none; background:#102a2c; color:white; border-radius:7px; cursor:pointer; font-size:12px; font-weight:bold;">Save Changes →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab 2: Change Password -->
+      <div id="tabAgentContentPassword" class="hidden">
+        <form id="changePasswordForm" style="display:grid; gap:12px;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; font-size:12px; color:#166534; display:flex; gap:12px; align-items:flex-start;">
+            <span style="font-size:22px; line-height:1;">✉️</span>
+            <div>
+              <strong style="display:block; margin-bottom:2px; font-size:12.5px; color:#14532d;">Direct Security Email Alert</strong>
+              Confirmation email will be sent directly to your logged-in account: 
+              <strong id="changePasswordTargetEmail" style="color:#0f172a; text-decoration:underline;">[Logged-in Email]</strong>
+              <div style="font-size:11px; color:#15803d; margin-top:3px;">Dispatched automatically to active session · No email selection or typing needed.</div>
+            </div>
+          </div>
+          <label style="font-size:11px; font-weight:bold; color:#102a2c;">Current Password *
+            <input type="password" id="changeCurrentPassword" required placeholder="Enter current password" style="width:100%; padding:9px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:#102a2c;">New Password (min 8 characters) *
+            <input type="password" id="changeNewPassword" minlength="8" required placeholder="••••••••" style="width:100%; padding:9px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:#102a2c;">Confirm New Password *
+            <input type="password" id="changeConfirmPassword" minlength="8" required placeholder="••••••••" style="width:100%; padding:9px; margin-top:4px; border:1px solid #ded8cc; border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <p id="passwordChangeMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+          <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px;">
+            <button type="submit" id="savePasswordBtn" class="primary-button" style="padding:9px 22px; border:none; background:#e8785a; color:white; border-radius:7px; cursor:pointer; font-size:12px; font-weight:bold;">Update Password & Send Email Alert →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paddle Billing Starter Pricing Modal -->
+  <div id="paddlePricingModal" class="paddle-modal-overlay">
+    <div class="paddle-modal-container">
+      <button class="paddle-close-btn" id="closePaddleModal">&times;</button>
+      
+      <div class="paddle-header">
+        <div class="paddle-powered-pill">
+          <span class="dot"></span>
+          <span>Paddle Billing Starter · Instant Activation</span>
+        </div>
+        <h2 class="paddle-title">Choose the plan that fits your portfolio</h2>
+        <p class="paddle-subtitle">Select between our Free tier or flexible Premium plans. Pay with Credit/Debit card or Direct Cash. Switch or cancel anytime.</p>
+        
+        <!-- Monthly / Annual Toggle -->
+        <div class="paddle-toggle-wrap">
+          <button type="button" class="paddle-toggle-btn active" id="billingToggleMonthly">Monthly</button>
+          <button type="button" class="paddle-toggle-btn" id="billingToggleAnnual">
+            Annual
+            <span class="paddle-discount-badge">Save 20%</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pricing Cards Grid -->
+      <div class="paddle-pricing-grid">
+        <!-- Starter (Free) -->
+        <div class="paddle-plan-card" id="planCardFREE">
+          <div class="paddle-plan-header">
+            <h3 class="paddle-plan-name">Starter (Free)</h3>
+            <p class="paddle-plan-desc">Essential tools to begin listing properties and receive buyer leads.</p>
+          </div>
+          <div class="paddle-plan-price">
+            <span class="currency">LKR</span>
+            <span class="amount">0</span>
+            <span class="cycle" id="cycleTextFREE">/month</span>
+          </div>
+          <div class="paddle-plan-action">
+            <button class="btn-paddle-plan current" id="btnSelectPlanFREE" data-plan="FREE">Current Plan</button>
+          </div>
+          <ul class="paddle-features-list">
+            <li><span class="paddle-check-icon">✓</span> <strong>Up to 2 active listings</strong></li>
+            <li><span class="paddle-check-icon">✓</span> Standard search visibility</li>
+            <li><span class="paddle-check-icon">✓</span> Direct buyer inquiries</li>
+            <li><span class="paddle-check-icon">✓</span> Public profile page</li>
+            <li><span class="paddle-check-icon">✓</span> Standard email support</li>
+          </ul>
+        </div>
+
+        <!-- Pro Plan (Most Popular) -->
+        <div class="paddle-plan-card featured" id="planCardPRO">
+          <div class="paddle-plan-badge">Most Popular · 10 Listings</div>
+          <div class="paddle-plan-header">
+            <h3 class="paddle-plan-name">Pro Agent</h3>
+            <p class="paddle-plan-desc">For active real estate professionals and serious property sellers looking to scale.</p>
+          </div>
+          <div class="paddle-plan-price">
+            <span class="currency">LKR</span>
+            <span class="amount" id="priceAmountPRO">4,900</span>
+            <span class="cycle" id="cycleTextPRO">/month</span>
+          </div>
+          <div class="paddle-plan-action">
+            <button class="btn-paddle-plan" id="btnSelectPlanPRO" data-plan="PRO">Upgrade to Pro &rarr;</button>
+          </div>
+          <ul class="paddle-features-list">
+            <li><span class="paddle-check-icon">✓</span> <strong>Up to 10 active listings</strong> (5x more!)</li>
+            <li><span class="paddle-check-icon">✓</span> <strong>Official "✓ Verified Agent" Badge</strong></li>
+            <li><span class="paddle-check-icon">✓</span> Priority search ranking placement</li>
+            <li><span class="paddle-check-icon">✓</span> Real-time buyer inquiry alerts</li>
+            <li><span class="paddle-check-icon">✓</span> Viewing request calendar management</li>
+            <li><span class="paddle-check-icon">✓</span> Priority verification queue</li>
+          </ul>
+        </div>
+
+        <!-- Elite Plan -->
+        <div class="paddle-plan-card elite" id="planCardELITE">
+          <div class="paddle-plan-badge gold">Unlimited Listings</div>
+          <div class="paddle-plan-header">
+            <h3 class="paddle-plan-name">Elite Broker</h3>
+            <p class="paddle-plan-desc">Maximum exposure and unlimited listing capacity for top agencies & developers.</p>
+          </div>
+          <div class="paddle-plan-price">
+            <span class="currency">LKR</span>
+            <span class="amount" id="priceAmountELITE">12,900</span>
+            <span class="cycle" id="cycleTextELITE">/month</span>
+          </div>
+          <div class="paddle-plan-action">
+            <button class="btn-paddle-plan" id="btnSelectPlanELITE" data-plan="ELITE">Upgrade to Elite &rarr;</button>
+          </div>
+          <ul class="paddle-features-list">
+            <li><span class="paddle-check-icon">✓</span> <strong>Unlimited active listings</strong> (No limits)</li>
+            <li><span class="paddle-check-icon">✓</span> <strong>Elite Gold Verified Badge</strong></li>
+            <li><span class="paddle-check-icon">✓</span> #1 Top Featured banner in search</li>
+            <li><span class="paddle-check-icon">✓</span> Fast-track 1-hour verification</li>
+            <li><span class="paddle-check-icon">✓</span> Dedicated Booking Manager coordination</li>
+            <li><span class="paddle-check-icon">✓</span> 24/7 Priority Support & Leads CRM</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Option: Pay-As-You-Go Single Listing Slot -->
+      <div style="margin-top: 18px; margin-bottom: 14px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px dashed #cbd5e1; border-radius: 12px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+            <span style="font-size: 18px;">💳</span>
+            <strong style="font-size: 14px; color: #102a2c;">Prefer Not to Subscribe? Pay Per Listing!</strong>
+            <span style="background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 9.5px; padding: 1.5px 7px; border-radius: 10px;">ON-DEMAND SLOT</span>
+          </div>
+          <p style="margin: 0; font-size: 11.5px; color: #64748b; line-height: 1.4;">
+            Used your 2 free plan slots? Purchase an <strong>Extra Listing Slot for <span class="agent-slot-price-label">LKR 2,500</span></strong>. One-time payment, no monthly commitment!
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="text-align: right;">
+            <span style="font-size: 9.5px; color: #64748b; text-transform: uppercase; font-weight: bold; display: block;">One-Time Fee</span>
+            <strong class="agent-slot-price-label" style="font-size: 18px; color: #102a2c;">LKR 2,500</strong>
+          </div>
+          <button type="button" id="btnBuySingleSlotAgent" class="primary-button" style="padding: 9px 18px; font-size: 12px; background: #e8785a; color: white; border-radius: 7px; font-weight: bold; cursor: pointer; border: none; white-space: nowrap;">
+            💳 Buy 1 Extra Slot &rarr;
+          </button>
+        </div>
+      </div>
+
+      <p style="text-align:center; font-size:11px; color:#94a3b8; margin:0;">
+        Secure payments powered by Paddle Billing Starter · Instant activation · Cancel anytime
+      </p>
+    </div>
+  </div>
+
+  <!-- Paddle Checkout Confirmation Modal -->
+  <div id="paddleCheckoutModal" class="paddle-modal-overlay">
+    <div class="paddle-checkout-card">
+      <button class="paddle-close-btn" id="closeCheckoutModal">&times;</button>
+      <div style="text-align:center; margin-bottom:16px;">
+        <span style="font-size:24px;">💳</span>
+        <h3 style="margin:6px 0 2px; font-size:18px; color:#102a2c;">Complete Your Subscription</h3>
+        <p style="margin:0; font-size:12px; color:#64748b;">Powered by Paddle Billing Starter</p>
+      </div>
+
+      <div class="checkout-plan-summary">
+        <div>
+          <strong id="checkoutPlanTitle" style="font-size:14px; color:#102a2c;">Pro Agent Plan</strong>
+          <p id="checkoutCycleDesc" style="margin:2px 0 0; font-size:11px; color:#64748b;">Monthly Billing · Up to 10 Listings</p>
+        </div>
+        <div style="text-align:right;">
+          <strong id="checkoutPriceText" style="font-size:18px; color:#e8785a; font-family:Georgia,serif;">LKR 4,900</strong>
+          <small id="checkoutPeriodText" style="display:block; font-size:10px; color:#64748b;">/month</small>
+        </div>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <label style="font-size:11px; font-weight:bold; color:#102a2c; margin-bottom:6px; display:block;">Select Payment Method:</label>
+      <div class="payment-tab-group">
+        <button type="button" class="payment-tab-btn active" id="payMethodCard">
+          <span>💳</span> Credit / Debit Card
+        </button>
+        <button type="button" class="payment-tab-btn" id="payMethodCash">
+          <span>💵</span> Cash / Bank Transfer
+        </button>
+      </div>
+
+      <!-- Card input fields simulation -->
+      <div id="cardPaymentSection" class="card-input-box">
+        <div>
+          <label style="font-size:10px; color:#64748b; font-weight:600; display:block; margin-bottom:3px;">Card Number</label>
+          <input type="text" id="checkoutCardNum" value="4242 •••• •••• 4242" placeholder="4242 4242 4242 4242" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; font-family:monospace; box-sizing:border-box;" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div>
+            <label style="font-size:10px; color:#64748b; font-weight:600; display:block; margin-bottom:3px;">Expiry Date</label>
+            <input type="text" id="checkoutCardExp" value="12/28" placeholder="MM/YY" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:#64748b; font-weight:600; display:block; margin-bottom:3px;">CVC / CVV</label>
+            <input type="text" id="checkoutCardCvc" value="888" placeholder="CVC" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; box-sizing:border-box;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Cash Payment Info -->
+      <div id="cashPaymentSection" class="cash-payment-info" style="display:none;">
+        <strong>💵 Direct Cash / Bank Transfer Payment:</strong>
+        <p style="margin:4px 0 0;">Pay directly to Nook & Key Finance Account (Commercial Bank AC: 8001293847) or pay cash at our agent concierge desk. Your account will be activated immediately upon checkout.</p>
+      </div>
+
+      <p id="checkoutErrorMsg" style="color:#ef4444; font-size:11px; margin:4px 0 10px; min-height:16px; text-align:center;"></p>
+
+      <button type="button" id="confirmCheckoutBtn" class="primary-button" style="width:100%; padding:12px; font-size:13px; font-weight:bold; border-radius:8px; background:#102a2c; color:white; border:none; cursor:pointer;">
+        Pay & Activate Plan &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- Apartment & Agent Full Details Modal (Matching Buyer Experience) -->
+  <div id="apartmentDetailsModal" class="modal hidden" style="z-index: 1050;">
+    <div class="modal-card" style="width: min(100%, 720px); max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding: 0; border-radius: 18px; background: #fffdf9; box-shadow: 0 20px 40px rgba(16,42,44,0.3); border: 1px solid rgba(222,216,204,0.8);">
+      <!-- Hero Image & Quick Header -->
+      <div style="position: relative; width: 100%; height: 260px; background: #102a2c; overflow: hidden; border-top-left-radius: 18px; border-top-right-radius: 18px;">
+        <img id="detailModalImage" src="" alt="Apartment" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=700&q=80'" />
+        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(16,42,44,0.15) 0%, rgba(16,42,44,0.85) 100%);"></div>
+        
+        <!-- Close Button -->
+        <button id="closeApartmentDetailsModal" class="close-button" style="position: absolute; top: 16px; right: 18px; z-index: 10; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; color: #fff; background: rgba(16,42,44,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;" title="Close">×</button>
+        
+        <!-- Header Badges -->
+        <div style="position: absolute; top: 16px; left: 18px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <span id="detailModalVerifiedBadge" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(4px); color: #065f46; font-size: 10.5px; font-weight: 800; padding: 3px 10px; border-radius: 20px; border: 1px solid #a7f3d0; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">✓ Verified Listing</span>
+          <span id="detailModalPropertyType" style="background: rgba(16,42,44,0.8); color: #ffd3c2; font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(232,120,90,0.4);">Apartment</span>
+        </div>
+
+        <!-- Price & Title in Hero Overlay -->
+        <div style="position: absolute; bottom: 18px; left: 24px; right: 24px; color: white;">
+          <p id="detailModalEyebrow" style="margin: 0 0 4px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.5px; color: #ffc5b0; font-weight: bold;">Verified Residence</p>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; flex-wrap: wrap;">
+            <div>
+              <h2 id="detailModalTitle" style="margin: 0; font-family: Georgia, serif; font-size: 25px; color: #fffdf9; line-height: 1.2;">Apartment Title</h2>
+              <p id="detailModalAddress" style="margin: 4px 0 0; font-size: 12.5px; color: #dbe5df;">📍 Address, City</p>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 9.5px; color: #cbd5e1; text-transform: uppercase; display: block; letter-spacing: 1px;">Listing Price</span>
+              <strong id="detailModalPrice" style="font-family: Georgia, serif; font-size: 24px; color: #ffc5b0;">LKR 0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div style="padding: 24px 26px 28px;">
+        
+        <!-- About Apartment Section -->
+        <div style="margin-bottom: 20px;">
+          <h4 style="margin: 0 0 8px; font-size: 13px; color: #102a2c; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">About This Apartment</h4>
+          <p id="detailModalDescription" style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.65; white-space: pre-line;">Full apartment description...</p>
+        </div>
+
+        <!-- Key Specs Grid -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; padding: 12px 14px; background: #faf8f5; border: 1px solid #e6e2d9; border-radius: 10px;">
+          <div>
+            <span style="font-size: 9.5px; color: #7b8882; text-transform: uppercase; font-weight: bold; display: block;">Type</span>
+            <strong id="detailModalSpecType" style="font-size: 12px; color: #102a2c; margin-top: 2px; display: block;">Apartment</strong>
+          </div>
+          <div>
+            <span style="font-size: 9.5px; color: #7b8882; text-transform: uppercase; font-weight: bold; display: block;">City</span>
+            <strong id="detailModalSpecCity" style="font-size: 12px; color: #102a2c; margin-top: 2px; display: block;">Colombo</strong>
+          </div>
+          <div>
+            <span style="font-size: 9.5px; color: #7b8882; text-transform: uppercase; font-weight: bold; display: block;">Postal Code</span>
+            <strong id="detailModalSpecPostal" style="font-size: 12px; color: #102a2c; margin-top: 2px; display: block;">00100</strong>
+          </div>
+          <div>
+            <span style="font-size: 9.5px; color: #7b8882; text-transform: uppercase; font-weight: bold; display: block;">Verification</span>
+            <strong id="detailModalSpecStatus" style="font-size: 12px; color: #047857; margin-top: 2px; display: block;">✓ Approved</strong>
+          </div>
+        </div>
+
+        <!-- Features & Amenities Section (Database-driven) -->
+        <div style="margin-bottom: 22px; padding: 16px; border: 1px solid #bbf7d0; border-radius: 12px; background: #f0fdf4;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 16px;">✦</span>
+              <h4 style="margin: 0; font-size: 13.5px; color: #14532d; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;">Apartment Amenities & Facilities</h4>
+            </div>
+            <span id="detailModalAmenityCountBadge" style="font-size: 10px; font-weight: 700; color: #047857; background: #dcfce7; padding: 2px 8px; border-radius: 12px;">0 Amenities</span>
+          </div>
+          <p style="margin: 0 0 12px; font-size: 11px; color: #166534; line-height: 1.4;">
+            Verified features confirmed for this property through the Nook & Key platform:
+          </p>
+          <div id="detailModalAmenitiesGrid" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Agent / Seller Information Card -->
+        <div style="margin-bottom: 22px; padding: 18px; border: 1px solid #cbd5e1; border-radius: 12px; background: white; box-shadow: 0 4px 14px rgba(16,42,44,0.04);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div id="detailModalAgentAvatar" style="width: 48px; height: 48px; border-radius: 50%; background: #102a2c; color: #fffdf9; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: bold; border: 2px solid #e8785a;">
+                A
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <h4 id="detailModalAgentName" style="margin: 0; font-size: 15px; color: #102a2c; font-weight: bold;">Agent Name</h4>
+                  <span id="detailModalAgentVerifiedBadge" style="font-size: 9.5px; font-weight: bold; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1px 7px; border-radius: 12px;">✓ Verified</span>
+                </div>
+                <p id="detailModalAgentRoleSubtitle" style="margin: 3px 0 0; font-size: 11.5px; color: #64748b;">
+                  Authorized Real Estate Representative
+                </p>
+              </div>
+            </div>
+            <div id="detailModalAgentRatingBox" style="text-align: right; background: #fffbeb; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 8px;">
+              <span id="detailModalAgentRating" style="font-size: 12px; font-weight: bold; color: #b45309;">★ 4.9</span>
+              <small style="display: block; font-size: 9px; color: #92400e;">Trust Rating</small>
+            </div>
+          </div>
+
+          <!-- Agent License & Contact Information -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px;">
+            <div>
+              <span style="color: #64748b; font-size: 9.5px; text-transform: uppercase; font-weight: bold; display: block;">License Number</span>
+              <strong id="detailModalAgentLicense" style="color: #102a2c; font-size: 11.5px;">AGT-2026-0001</strong>
+            </div>
+            <div>
+              <span style="color: #64748b; font-size: 9.5px; text-transform: uppercase; font-weight: bold; display: block;">Subscription Plan</span>
+              <strong id="detailModalAgentPlan" style="color: #e8785a; font-size: 11.5px;">PRO Agent</strong>
+            </div>
+            <div>
+              <span style="color: #64748b; font-size: 9.5px; text-transform: uppercase; font-weight: bold; display: block;">Direct Telephone</span>
+              <a id="detailModalAgentPhone" href="tel:+94771234567" style="color: #0369a1; font-weight: bold; text-decoration: none; font-size: 11.5px;">📞 +94 77 123 4567</a>
+            </div>
+            <div>
+              <span style="color: #64748b; font-size: 9.5px; text-transform: uppercase; font-weight: bold; display: block;">Official Email</span>
+              <a id="detailModalAgentEmail" href="mailto:agent@nookandkey.com" style="color: #0369a1; font-weight: bold; text-decoration: none; word-break: break-all; font-size: 11.5px;">✉️ agent@nookandkey.com</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action / Footer Buttons -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid #e2e8f0; flex-wrap: wrap;">
+          <div id="detailModalFooterOwnerNote" style="font-size: 11.5px; color: #64748b;">
+            <!-- Dynamic note or preview badge -->
+          </div>
+          
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" id="closeApartmentDetailsModalBtn" class="secondary-button" style="padding: 10px 18px; font-size: 12px;">Close</button>
+            <a id="detailModalDirectContactBtn" href="tel:" class="primary-button" style="padding: 10px 18px; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; border-radius: 7px; background:#e8785a; color:white;">
+              <span>📞 Contact Representative</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Booking Dispute Modal (UC - 06) -->
+  <div id="agentDisputeModal" class="modal hidden" style="z-index: 1200;">
+    <div class="modal-card" style="width: min(100%, 540px); max-height: 90vh; overflow-y: auto; padding: 26px 28px;">
+      <button class="close-button" id="closeAgentDisputeModal">×</button>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; border-bottom:1px solid var(--line); padding-bottom:12px;">
+        <span style="font-size:26px;">⚖️</span>
+        <div>
+          <span style="font-size:10px; font-weight:800; color:#ea580c; text-transform:uppercase; letter-spacing:1px; background:#fff7ed; padding:2px 8px; border-radius:10px; border:1px solid #fed7aa;">
+            Dispute Mediation (UC-06)
+          </span>
+          <h2 style="margin:4px 0 0; font-size:20px; color:var(--ink);">Report Booking Dispute</h2>
+          <p style="margin:2px 0 0; font-size:11.5px; color:var(--muted);">Report a client viewing dispute or no-show directly to the Booking Manager for mediation.</p>
+        </div>
+      </div>
+
+      <!-- Booking Info Summary Card -->
+      <div style="background:#fffaf0; border:1px solid #fde68a; border-radius:9px; padding:12px 14px; margin-bottom:14px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+          <div>
+            <span style="font-size:10px; font-weight:bold; color:#b45309; text-transform:uppercase; display:block;">Property</span>
+            <strong id="agentDisputePropertyTitle" style="font-size:13px; color:#1e293b;">—</strong>
+          </div>
+          <span id="agentDisputeBookingBadge" style="font-size:10px; font-family:monospace; font-weight:bold; background:#fff; padding:2px 8px; border-radius:6px; border:1px solid #fed7aa; color:#c2410c;">#BK</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; padding-top:8px; border-top:1px dashed #fcd34d;">
+          <div>
+            <span style="font-size:10px; color:#78350f; display:block;">Buyer / Client:</span>
+            <strong id="agentDisputeBuyerName" style="color:#0f172a;">—</strong>
+          </div>
+          <div>
+            <span style="font-size:10px; color:#78350f; display:block;">Scheduled Viewing:</span>
+            <strong id="agentDisputeSchedule" style="color:#0f172a;">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dispute Submission Form -->
+      <form id="agentDisputeForm" style="display:grid; gap:12px;">
+        <input type="hidden" id="agentDisputeBookingId" />
+
+        <label style="font-size:11.5px; font-weight:bold; color:var(--ink);">
+          Dispute Category / Nature of Conflict *
+          <select id="agentDisputeReason" required style="width:100%; padding:9px; border:1px solid var(--line); border-radius:6px; margin-top:4px; font-size:12px; background:white;">
+            <option value="BUYER_NO_SHOW">Buyer No-Show (Client failed to attend scheduled viewing)</option>
+            <option value="LATE_CANCELLATION">Client Cancelled Without Adequate Notice</option>
+            <option value="UNAUTHORIZED_ACCESS">Unauthorized Access or Property Rule Breach</option>
+            <option value="PAYMENT_DISPUTE">Deposit / Advance Payment Conflict</option>
+            <option value="UNPROFESSIONAL_BEHAVIOR">Unprofessional Conduct or Safety Concern</option>
+            <option value="OTHER">Other Dispute / Issue</option>
+          </select>
+        </label>
+
+        <label style="font-size:11.5px; font-weight:bold; color:var(--ink);">
+          Detailed Statement & Evidence *
+          <textarea id="agentDisputeDetails" required rows="4" placeholder="Explain what occurred (e.g., agent and owner waited at apartment, client did not show up and did not answer phone calls)..." style="width:100%; padding:9px; border:1px solid var(--line); border-radius:6px; margin-top:4px; font-size:12px; font-family:Arial,sans-serif; box-sizing:border-box;"></textarea>
+        </label>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:7px; padding:9px 12px; font-size:11px; color:#64748b;">
+          ℹ️ <strong>Mediation Process:</strong> The Booking Manager investigates disputes impartially and issues official resolution orders (Full Refund, 50% Mutual Refund, or Forfeiture to Host).
+        </div>
+
+        <p id="agentDisputeMessage" class="message" style="margin:2px 0; font-size:11.5px; min-height:16px;"></p>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
+          <button type="button" id="cancelAgentDisputeBtn" class="secondary-button" style="padding:9px 16px;">Cancel</button>
+          <button type="submit" id="submitAgentDisputeBtn" class="primary-button" style="padding:9px 20px; background:#ea580c; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+            ⚠️ Submit Dispute to Manager →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Viewing Availability / Schedule Configuration Modal -->
+  <div id="availabilityModal" class="modal-overlay hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(16,42,44,0.6); z-index:2000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+    <div style="background:white; border-radius:12px; width:92%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.2); padding:24px; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0; font-size:16px; color:#102a2c; display:flex; align-items:center; gap:8px;">
+            <span>🗓️</span> Manage Viewing Availability
+          </h3>
+          <p style="margin:3px 0 0; font-size:11px; color:#64748b;">
+            Set the days and time slots when you are available for buyer property viewings.
+          </p>
+        </div>
+        <button type="button" id="closeAvailabilityModal" style="border:none; background:transparent; font-size:18px; cursor:pointer; color:#64748b; padding:0 4px;">✕</button>
+      </div>
+
+      <input type="hidden" id="availListingId" />
+      <div style="margin-bottom:12px;">
+        <label style="display:block; font-size:11.5px; font-weight:700; color:#102a2c; margin-bottom:4px;">Property Apartment</label>
+        <div id="availListingTitle" style="font-size:12px; font-weight:600; color:#0f766e; background:#f0fdfa; border:1px solid #ccfbf1; padding:8px 12px; border-radius:6px;">Select a listing</div>
+      </div>
+
+      <!-- Calendar Dates & Day Selection -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11.5px; font-weight:700; color:#102a2c; margin-bottom:6px;">
+          Available Calendar Dates for Viewings:
+        </label>
+        
+        <!-- Date Selector Input & Quick Actions -->
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px;">
+          <input type="date" id="availDatePicker" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; color:#1e293b; outline:none;" />
+          <button type="button" id="addAvailDateBtn" class="primary-button" style="padding:7px 12px; font-size:11px; border-radius:6px; background:#0f766e; border:none; color:white; cursor:pointer;">+ Add Date</button>
+          <div style="display:inline-flex; gap:4px;">
+            <button type="button" class="avail-quick-date-btn" data-days="0" style="padding:6px 9px; font-size:10.5px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; color:#334155; cursor:pointer;">+ Today</button>
+            <button type="button" class="avail-quick-date-btn" data-days="1" style="padding:6px 9px; font-size:10.5px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; color:#334155; cursor:pointer;">+ Tomorrow</button>
+            <button type="button" id="addNext7DaysBtn" style="padding:6px 9px; font-size:10.5px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; color:#334155; cursor:pointer;">+ Next 7 Days</button>
+          </div>
+        </div>
+
+        <!-- Selected Dates Badges -->
+        <div id="availSelectedDatesContainer" style="display:flex; flex-wrap:wrap; gap:6px; min-height:36px; padding:8px; background:#f1f5f9; border-radius:8px; border:1px dashed #cbd5e1; margin-bottom:10px;">
+          <span style="font-size:11px; color:#94a3b8; align-self:center;" id="noDatesPlaceholder">No calendar dates selected yet. Pick a date above or click "+ Next 7 Days".</span>
+        </div>
+
+        <!-- Recurring Days Option (Collapsible) -->
+        <details style="margin-top:6px; font-size:11px; color:#475569;">
+          <summary style="cursor:pointer; font-weight:600; color:#0f766e; margin-bottom:6px;">⚙️ Or configure recurring days of week</summary>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:6px; margin-top:6px;" id="availDaysContainer">
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="MONDAY" checked /> Mon
+            </label>
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="TUESDAY" checked /> Tue
+            </label>
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="WEDNESDAY" checked /> Wed
+            </label>
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="THURSDAY" checked /> Thu
+            </label>
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="FRIDAY" checked /> Fri
+            </label>
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="SATURDAY" checked /> Sat
+            </label>
+            <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:5px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" class="avail-day-cb" value="SUNDAY" /> Sun
+            </label>
+          </div>
+        </details>
+      </div>
+
+      <!-- Available Time Slots -->
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-size:11.5px; font-weight:700; color:#102a2c; margin-bottom:6px;">
+          Available Viewing Time Slots:
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;" id="availSlotsContainer">
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="09:00 AM - 10:00 AM" checked /> 09:00 AM - 10:00 AM
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="10:00 AM - 11:00 AM" checked /> 10:00 AM - 11:00 AM
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="11:00 AM - 12:00 PM" checked /> 11:00 AM - 12:00 PM
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="01:00 PM - 02:00 PM" checked /> 01:00 PM - 02:00 PM
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="02:00 PM - 03:00 PM" checked /> 02:00 PM - 03:00 PM
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="03:00 PM - 04:00 PM" checked /> 03:00 PM - 04:00 PM
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:6px 10px; border-radius:6px; cursor:pointer;">
+            <input type="checkbox" class="avail-slot-cb" value="04:00 PM - 05:00 PM" checked /> 04:00 PM - 05:00 PM
+          </label>
+        </div>
+      </div>
+
+      <div style="background:#fffbeb; border:1px solid #fef3c7; border-radius:6px; padding:10px; font-size:11px; color:#92400e; margin-bottom:14px; line-height:1.4;">
+        💡 <strong>Pro-Tip:</strong> Buyers booking this listing will only be permitted to select from your active viewing schedule, preventing missed appointments or cancellations.
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" id="cancelAvailabilityModal" class="secondary-button" style="padding:8px 14px; font-size:11px;">Cancel</button>
+        <button type="button" id="saveAvailabilityBtn" class="primary-button" style="padding:8px 18px; font-size:11px;">✓ Save Availability</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/paddle_billing.js?v=20261007_final"></script>
+  <script src="js/agent_page.js?v=20261007_final"></script>
+</body>
+</html>

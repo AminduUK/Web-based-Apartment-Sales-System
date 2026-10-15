@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin dashboard | Nook & Key</title>
+  <link rel="stylesheet" href="css/admin_page.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <a href="index.html" class="logo">nook<span>&</span>key</a>
+    <div class="workspace-label">Admin console</div>
+    <nav class="side-nav">
+      <a class="active" href="#overview">▦ <span>Overview</span></a>
+      <a href="#users" id="navUsers">♙ <span>User management</span><b id="userNavCount">248</b></a>
+      <a href="#listings">⌂ <span>All listings</span><b>86</b></a>
+      <a href="#verification">✓ <span>Verification health</span><b>7</b></a>
+      <a href="#amenities" id="navAmenities">✦ <span>Amenities</span><b id="amenityNavCount">0</b></a>
+      <a href="#reports" id="navReports">▥ <span>Reports & analytics</span></a>
+      <a href="#settings" id="navSettings">⚙ <span>System settings</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="index.html">↩ <span>Back to website</span></a>
+      <button id="logoutButton">⇥ <span>Sign out</span></button>
+    </div>
+  </aside>
+
+  <main class="dashboard-main">
+    <header class="topbar">
+      <div><p class="eyebrow" id="todayDate">Wednesday, 17 September 2026</p><h1 id="adminGreetingHeading">Good morning, <em id="adminGreetingName">Admin.</em></h1></div>
+      <div class="topbar-actions"><button class="icon-button">⌕</button><button class="notification-button" id="adminNotifBtn" title="Administrative Notifications" style="position:relative; cursor:pointer;">◔<span id="adminNotifBadge" class="hidden" style="position:absolute; top:-3px; right:-3px; background:#e8785a; color:white; border-radius:50%; font-size:9px; width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; font-weight:bold;">0</span></button><div class="profile-chip" id="profileChip" style="cursor:pointer;"><span class="avatar" id="adminAvatar">AD</span><span><strong id="adminFullName">System admin</strong><small>Full access</small></span><span>⌄</span></div></div>
+    </header>
+
+    <section class="admin-banner" id="overview">
+      <div><p class="eyebrow">Marketplace command center</p><h2>See the whole<br /><em>picture clearly.</em></h2><p>Monitor Nook & Key activity, keep your teams aligned, and make sure every part of the apartment journey is moving well.</p></div>
+      <div class="system-health"><div class="health-header"><span>System health</span><b><i></i> All systems operational</b></div><div class="health-line"><span style="width:96%"></span></div><div class="health-meta"><span>API uptime <strong>99.98%</strong></span><span>Last sync <strong>2 min ago</strong></span></div></div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card featured"><div class="stat-top"><span>Total users</span><span class="stat-icon">♙</span></div><strong id="totalUsers">248</strong><p><b>+18</b> registered this month</p><div class="sparkline"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+      <article class="stat-card"><div class="stat-top"><span>Active listings</span><span class="stat-icon orange">⌂</span></div><strong id="activeListings">86</strong><p><b>+12%</b> vs last month</p><div class="stat-bar"><span style="width:72%"></span></div></article>
+      <article class="stat-card"><div class="stat-top"><span>Pending verification</span><span class="stat-icon purple">◌</span></div><strong id="pendingVerification">07</strong><p><b>3 high priority</b> need review</p><div class="stat-bar purple-bar"><span style="width:42%"></span></div></article>
+      <article class="stat-card"><div class="stat-top"><span>Bookings this month</span><span class="stat-icon green">□</span></div><strong>124</strong><p><b>+24%</b> completed successfully</p><div class="stat-bar green-bar"><span style="width:81%"></span></div></article>
+    </section>
+
+    <div class="main-grid">
+      <section class="content-card chart-card" id="reports"><div class="section-header"><div><p class="eyebrow">Marketplace activity</p><h2>Growth overview</h2></div><select id="chartPeriod"><option>Last 30 days</option><option>Last 90 days</option><option>This year</option></select></div><div class="chart-legend"><span><i class="legend-listings"></i> Listings</span><span><i class="legend-users"></i> New users</span><b>+18.6% <small>growth</small></b></div><div class="line-chart"><div class="y-labels"><span>300</span><span>200</span><span>100</span><span>0</span></div><div class="chart-area"><div class="grid-lines"><i></i><i></i><i></i><i></i></div><svg viewBox="0 0 640 170" preserveAspectRatio="none" aria-label="Growth chart"><path class="chart-fill" d="M0,135 C45,130 58,110 95,118 S145,105 180,96 S230,112 265,84 S310,75 345,88 S385,46 420,59 S467,39 500,47 S545,25 580,35 S620,22 640,16 L640,170 L0,170 Z"/><path class="chart-line" d="M0,135 C45,130 58,110 95,118 S145,105 180,96 S230,112 265,84 S310,75 345,88 S385,46 420,59 S467,39 500,47 S545,25 580,35 S620,22 640,16"/><path class="users-line" d="M0,151 C55,143 72,135 112,143 S165,128 200,134 S245,119 280,128 S325,117 360,121 S420,90 455,105 S500,89 535,95 S585,72 640,78"/></svg><div class="x-labels"><span>Aug 19</span><span>Aug 26</span><span>Sep 02</span><span>Sep 09</span><span>Sep 17</span></div></div></div></section>
+
+      <section class="content-card role-card" id="users"><div class="section-header"><div><p class="eyebrow">People in the system</p><h2>User mix</h2></div><a href="#users" id="quickManageUsersLink">Manage →</a></div><div class="role-donut"><div class="donut"><strong>248</strong><small>total users</small></div>        <div class="role-legend"><span><i class="buyer-dot"></i> Buyers <b>142</b></span><span><i class="agent-dot"></i> Agents <b>38</b></span><span><i class="seller-dot"></i> Sellers <b>46</b></span><span><i class="staff-dot"></i> Operations <b>22</b></span></div></div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button class="secondary-button full-width" id="manageUsers">Manage Users</button>
+          <button class="primary-button full-width" id="manageAmenities">✦ Amenities</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="content-card" id="listings">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Marketplace oversight</p>
+          <h2>Recent platform activity</h2>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" id="refreshActivity">↻ Refresh</button>
+          <button class="primary-button" id="exportReport">↓ Export report</button>
+        </div>
+      </div>
+      <div class="activity-toolbar" style="display: flex; gap: 9px; margin: 25px 0 14px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 4px;">
+          <div class="search-input" id="activitySearchContainer" style="display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); font-size: 16px; background: white; height: 38px; box-sizing: border-box; transition: border-color .2s, box-shadow .2s;">
+            <span>⌕</span>
+            <input id="activitySearch" type="search" placeholder="Search activity by title, details, owner, or role..." style="width: 100%; padding: 8px 0; border: 0; outline: 0; font-size: 11px; background: transparent; color: var(--ink);" />
+            <button type="button" id="clearActivitySearchBtn" style="display: none; border: none; background: transparent; color: #94a3b8; font-size: 15px; cursor: pointer; padding: 0 4px;" title="Clear search">✕</button>
+          </div>
+          <div id="activitySearchValidationError" style="display: none; align-items: center; gap: 5px; color: #dc2626; font-size: 11px; font-weight: 600; padding: 2px 4px;">
+            <span>⚠️</span>
+            <span id="activitySearchValidationText">Please enter a search term before searching.</span>
+          </div>
+        </div>
+        <button type="button" id="activitySearchBtn" class="primary-button" style="padding: 0 18px; font-size: 11px; height: 38px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; border-radius: 7px; cursor: pointer;">
+          <span>🔍</span> Search
+        </button>
+        <select id="activityFilter" style="height: 38px; min-width: 145px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; outline: 0; font-size: 11px; background: white; color: var(--ink); cursor: pointer;">
+          <option value="ALL">All activity</option>
+          <option value="LISTING">Listings</option>
+          <option value="USER">Users</option>
+          <option value="BOOKING">Bookings</option>
+          <option value="VERIFICATION">Verification</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Owner</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Time</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="activityTableBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state hidden">No activity matches your search.</div>
+    </section>
+
+    <div class="lower-grid">
+      <section class="content-card" id="verification">
+        <div class="section-header compact">
+          <div><p class="eyebrow">Trust & safety</p><h2>Verification health</h2></div>
+          <a href="verificationOfficer_page.html">Open queue →</a>
+        </div>
+        <div class="verification-summary">
+          <div class="verification-ring"><strong>96.8%</strong><small>quality score</small></div>
+          <div class="verification-details">
+            <p><span class="green-pip"></span><b>79</b> listings verified this week</p>
+            <p><span class="orange-pip"></span><b>7</b> listings awaiting review</p>
+            <p><span class="red-pip"></span><b>3</b> items flagged</p>
+          </div>
+        </div>
+        <button type="button" id="btnOpenOverrideModal" class="secondary-button" style="margin-top:14px; width:100%; font-size:11px; font-weight:bold; color:#be123c; border:1px solid #fecdd3; background:#fff1f2; padding:8px 12px; border-radius:6px; cursor:pointer;">⚠️ Revoke Verification / Override Listing</button>
+      </section>
+
+      <section class="content-card" id="adminAlerts">
+        <div class="section-header compact">
+          <div><p class="eyebrow">Needs attention</p><h2>Admin alerts</h2></div>
+          <span class="alert-count">3 active</span>
+        </div>
+        <div class="alert-list">
+          <div>
+            <span class="alert-icon orange-alert">!</span>
+            <div><strong>Verification queue growing</strong><p>7 listings need officer review.</p></div>
+            <button data-alert="verification">→</button>
+          </div>
+          <div>
+            <span class="alert-icon purple-alert">⚙</span>
+            <div><strong>Role permissions updated</strong><p>Review the changes from yesterday.</p></div>
+            <button data-alert="permissions">→</button>
+          </div>
+          <div>
+            <span class="alert-icon green-alert">✓</span>
+            <div><strong>Backup completed</strong><p>Last backup finished 2 hours ago.</p></div>
+            <button data-alert="backup">→</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SYSTEM SETTINGS & DYNAMIC PRICING SECTION -->
+    <section class="content-card" id="settings" style="margin-top: 24px; scroll-margin-top: 20px; transition: box-shadow 0.3s ease, border-color 0.3s ease;">
+      <div class="section-header" style="border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 20px;">
+        <div>
+          <p class="eyebrow" style="color: var(--coral); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px; margin-bottom: 4px;">Platform Configuration & Monetization</p>
+          <h2 style="font-family: Georgia, serif; font-size: 26px; color: var(--ink); margin: 0;">⚙ System Settings & Pricing Controls</h2>
+          <p style="color: var(--muted); font-size: 12px; margin: 6px 0 0;">
+            Dynamically configure Pay-Per-Listing fees, Agent subscription pricing, quotas, and marketplace policies in real time. Changes take effect across all portal checkouts immediately.
+          </p>
+        </div>
+        <div class="header-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="secondary-button" id="btnResetSettings" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; cursor: pointer;">
+            ↺ Reset Defaults
+          </button>
+          <button type="submit" form="systemSettingsForm" class="primary-button" id="btnSaveSettings" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(232, 120, 90, 0.25);">
+            💾 Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Sync Status Banner -->
+      <div id="settingsAlertBanner" style="display: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; font-weight: 500;"></div>
+
+      <form id="systemSettingsForm" style="display: grid; gap: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 20px;">
+
+          <!-- Card 1: Listing & Slot Pricing (Pay-Per-Listing) -->
+          <div style="background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 12px;">
+              <span style="font-size: 22px; background: #fff; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">💳</span>
+              <div>
+                <h3 style="margin: 0; font-size: 15px; color: var(--ink);">Pay-Per-Listing & Slot Fees</h3>
+                <small style="color: var(--muted); font-size: 11px;">Charges for on-demand listing publication & deposits</small>
+              </div>
+            </div>
+
+            <!-- Seller Single Listing Pass -->
+            <div>
+              <label for="setting_PRICING_SELLER_SLOT" style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 6px;">
+                <span>Seller Single Listing Pass</span>
+                <span class="currency-tag" style="color: var(--coral); font-weight: bold;">LKR</span>
+              </label>
+              <div style="position: relative;">
+                <input type="number" step="50" min="0" id="setting_PRICING_SELLER_SLOT" name="PRICING_SELLER_SLOT" required
+                  style="width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--ink); background: #fff;" />
+              </div>
+              <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 10.5px;">Fee charged to a seller to publish an extra apartment without becoming an agent.</small>
+            </div>
+
+            <!-- Agent Extra Listing Slot -->
+            <div>
+              <label for="setting_PRICING_AGENT_SLOT" style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 6px;">
+                <span>Agent Extra Listing Slot</span>
+                <span class="currency-tag" style="color: var(--coral); font-weight: bold;">LKR</span>
+              </label>
+              <div style="position: relative;">
+                <input type="number" step="50" min="0" id="setting_PRICING_AGENT_SLOT" name="PRICING_AGENT_SLOT" required
+                  style="width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--ink); background: #fff;" />
+              </div>
+              <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 10.5px;">Fee for agents on Free tier to add 1 extra listing slot without a monthly subscription.</small>
+            </div>
+
+            <!-- Booking Viewing Advance Deposit -->
+            <div>
+              <label for="setting_PRICING_BOOKING_ADVANCE" style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 6px;">
+                <span>Buyer Viewing Advance Deposit</span>
+                <span class="currency-tag" style="color: var(--coral); font-weight: bold;">LKR</span>
+              </label>
+              <div style="position: relative;">
+                <input type="number" step="100" min="0" id="setting_PRICING_BOOKING_ADVANCE" name="PRICING_BOOKING_ADVANCE" required
+                  style="width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--ink); background: #fff;" />
+              </div>
+              <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 10.5px;">Standard reservation deposit paid by a buyer when requesting an apartment viewing.</small>
+            </div>
+          </div>
+
+          <!-- Card 2: Agent Subscription Plans & Quotas -->
+          <div style="background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 12px;">
+              <span style="font-size: 22px; background: #fff; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">👑</span>
+              <div>
+                <h3 style="margin: 0; font-size: 15px; color: var(--ink);">Agent Subscription Plans</h3>
+                <small style="color: var(--muted); font-size: 11px;">Monthly tier pricing & maximum listing quotas</small>
+              </div>
+            </div>
+
+            <!-- Pro Plan Settings Grid -->
+            <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid var(--line);">
+              <span style="display: inline-block; padding: 2px 8px; background: #eeeafa; color: var(--purple); font-size: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 10px;">PRO AGENT TIER</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label for="setting_SUBSCRIPTION_PRO_PRICE" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Price / Month (LKR)</label>
+                  <input type="number" step="100" min="0" id="setting_SUBSCRIPTION_PRO_PRICE" name="SUBSCRIPTION_PRO_PRICE" required
+                    style="width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600;" />
+                </div>
+                <div>
+                  <label for="setting_LIMIT_AGENT_PRO" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Listing Limit</label>
+                  <input type="number" step="1" min="1" id="setting_LIMIT_AGENT_PRO" name="LIMIT_AGENT_PRO" required
+                    style="width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600;" />
+                </div>
+              </div>
+              <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 10px;">Standard tier for independent professional real estate agents.</small>
+            </div>
+
+            <!-- Elite Plan Settings Grid -->
+            <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid var(--line);">
+              <span style="display: inline-block; padding: 2px 8px; background: #fbe7dd; color: var(--coral); font-size: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 10px;">ELITE AGENCY TIER</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label for="setting_SUBSCRIPTION_ELITE_PRICE" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Price / Month (LKR)</label>
+                  <input type="number" step="100" min="0" id="setting_SUBSCRIPTION_ELITE_PRICE" name="SUBSCRIPTION_ELITE_PRICE" required
+                    style="width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600;" />
+                </div>
+                <div>
+                  <label for="setting_LIMIT_AGENT_ELITE" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Listing Limit</label>
+                  <input type="number" step="10" min="10" id="setting_LIMIT_AGENT_ELITE" name="LIMIT_AGENT_ELITE" required
+                    style="width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600;" />
+                </div>
+              </div>
+              <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 10px;">Enterprise tier for real estate agencies and high-volume brokers (unlimited capacity).</small>
+            </div>
+          </div>
+
+          <!-- Card 3: Free Quotas & Platform Policy -->
+          <div style="background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 12px;">
+              <span style="font-size: 22px; background: #fff; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">⚖️</span>
+              <div>
+                <h3 style="margin: 0; font-size: 15px; color: var(--ink);">Free Quotas & Policies</h3>
+                <small style="color: var(--muted); font-size: 11px;">Default allowances and platform governance</small>
+              </div>
+            </div>
+
+            <!-- Free Seller & Free Agent Quotas -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label for="setting_LIMIT_SELLER_FREE" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Seller Free Listings</label>
+                <input type="number" step="1" min="0" id="setting_LIMIT_SELLER_FREE" name="LIMIT_SELLER_FREE" required
+                  style="width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600; background: #fff;" />
+                <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 10px;">Free slots for homeowners.</small>
+              </div>
+              <div>
+                <label for="setting_LIMIT_AGENT_FREE" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Agent Free Listings</label>
+                <input type="number" step="1" min="0" id="setting_LIMIT_AGENT_FREE" name="LIMIT_AGENT_FREE" required
+                  style="width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600; background: #fff;" />
+                <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 10px;">Free tier agent quota.</small>
+              </div>
+            </div>
+
+            <!-- Currency & Dispute Window -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label for="setting_PLATFORM_CURRENCY" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Market Currency</label>
+                <select id="setting_PLATFORM_CURRENCY" name="PLATFORM_CURRENCY" required
+                  style="width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600; background: #fff;">
+                  <option value="LKR">LKR (Sri Lankan Rupee)</option>
+                  <option value="USD">USD (US Dollar)</option>
+                  <option value="EUR">EUR (Euro)</option>
+                  <option value="GBP">GBP (British Pound)</option>
+                </select>
+              </div>
+              <div>
+                <label for="setting_DISPUTE_WINDOW_DAYS" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Dispute Window (Days)</label>
+                <input type="number" step="1" min="1" max="90" id="setting_DISPUTE_WINDOW_DAYS" name="DISPUTE_WINDOW_DAYS" required
+                  style="width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600; background: #fff;" />
+              </div>
+            </div>
+
+            <!-- Mandatory Verification -->
+            <div>
+              <label for="setting_LEGAL_VERIFICATION_REQUIRED" style="display: block; font-size: 11px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Legal Title Deed Verification</label>
+              <select id="setting_LEGAL_VERIFICATION_REQUIRED" name="LEGAL_VERIFICATION_REQUIRED" required
+                style="width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 600; background: #fff;">
+                <option value="true">Mandatory (Requires Officer Review before Publishing)</option>
+                <option value="false">Optional (Immediate Instant Publishing Allowed)</option>
+              </select>
+              <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 10px;">When enabled, newly created listings must be approved by a Verification Officer.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer status bar inside section -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 8px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></span>
+            <span>Database Sync: <strong id="settingsSyncTimestamp">Active</strong></span>
+          </div>
+          <div>
+            <span>All pricing adjustments reflect in Paddle Sandbox, checkout flows, and user dashboards in real time.</span>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+  <div id="userModal" class="modal hidden">
+    <div class="modal-card" style="width: min(100%, 860px); max-height: 90vh; overflow-y: auto;">
+      <button class="close-button" id="closeUserModal">×</button>
+      <p class="eyebrow">Platform Administration</p>
+      <h2>User & Staff Management</h2>
+      <p class="modal-description">Create Verification Officers or Booking Managers, and manage permissions for all users.</p>
+
+      <!-- Add Staff Member Section -->
+      <section style="margin: 20px 0; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--cream);">
+        <h3 style="margin: 0 0 12px; font-size: 15px; color: var(--ink);">+ Add New Staff Member</h3>
+        <p style="margin: 0 0 14px; font-size: 11px; color: var(--muted);">Staff roles (Verification Officer & Booking Manager) cannot self-register and must be provisioned by an Admin.</p>
+        <form id="createStaffForm" style="display: grid; gap: 12px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <label style="font-size: 11px; font-weight: bold; color: var(--ink);">Staff Role
+              <select id="staffRole" required style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px; background: white;">
+                <option value="VERIFICATION_OFFICER" selected>Verification Officer</option>
+                <option value="BOOKING_MANAGER">Booking Manager</option>
+                <option value="ADMIN">System Administrator</option>
+              </select>
+            </label>
+            <label style="font-size: 11px; font-weight: bold; color: var(--ink);">First Name
+              <input id="staffFirstName" type="text" placeholder="e.g. Rashmi" required style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px;" />
+            </label>
+            <label style="font-size: 11px; font-weight: bold; color: var(--ink);">Last Name
+              <input id="staffLastName" type="text" placeholder="e.g. Silva" required style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px;" />
+            </label>
+          </div>
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px;">
+            <label style="font-size: 11px; font-weight: bold; color: var(--ink);">Email Address
+              <input id="staffEmail" type="email" placeholder="officer@nookandkey.com" required style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px;" />
+            </label>
+            <label style="font-size: 11px; font-weight: bold; color: var(--ink);">Phone Number
+              <input id="staffPhone" type="tel" placeholder="+94 77 000 0000" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px;" />
+            </label>
+            <label style="font-size: 11px; font-weight: bold; color: var(--ink);">Initial Password
+              <input id="staffPassword" type="password" minlength="8" placeholder="At least 8 chars" required style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px;" />
+            </label>
+          </div>
+          <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 5px;">
+            <p id="staffMessage" class="message" style="margin: 0; flex: 1;"></p>
+            <button type="submit" id="submitStaffButton" class="primary-button" style="padding: 10px 20px;">Create Staff Account →</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- All Platform Users Section -->
+      <section style="margin-top: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="margin: 0; font-size: 15px; color: var(--ink);">All Platform Users</h3>
+            <span id="userCountLabel" style="font-size: 11px; color: var(--muted);">Loading users...</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <select id="userRoleFilter" style="padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 11px; height: 36px; background: white; cursor: pointer;">
+              <option value="ALL">All Roles</option>
+              <option value="VERIFICATION_OFFICER">Verification Officers</option>
+              <option value="BOOKING_MANAGER">Booking Managers</option>
+              <option value="ADMIN">Administrators</option>
+              <option value="AGENT">Agents</option>
+              <option value="SELLER">Sellers</option>
+              <option value="BUYER">Buyers</option>
+            </select>
+            <button class="secondary-button" id="refreshUsersList" style="height: 36px; padding: 0 12px; font-size: 11px; border-radius: 6px;">↻ Refresh</button>
+          </div>
+        </div>
+
+        <!-- User Search Bar with Validation Error -->
+        <div class="user-search-toolbar" style="display: flex; gap: 8px; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 4px;">
+            <div class="search-input" id="userSearchContainer" style="display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); font-size: 16px; background: white; transition: border-color .2s, box-shadow .2s; height: 38px; box-sizing: border-box;">
+              <span>⌕</span>
+              <input id="userSearchInput" type="search" placeholder="Search users by name, email, phone, or role..." style="width: 100%; padding: 8px 0; border: 0; outline: 0; color: var(--ink); font-size: 12px; background: transparent;" />
+              <button type="button" id="clearUserSearchBtn" style="display: none; border: none; background: transparent; color: #94a3b8; font-size: 15px; cursor: pointer; padding: 0 4px;" title="Clear search">✕</button>
+            </div>
+            <div id="userSearchValidationError" style="display: none; align-items: center; gap: 5px; color: #dc2626; font-size: 11px; font-weight: 600; padding: 2px 4px;">
+              <span>⚠️</span>
+              <span id="userSearchValidationText">Please enter a search term (e.g. name, email, phone, or role) before searching.</span>
+            </div>
+          </div>
+          <button type="button" id="userSearchBtn" class="primary-button" style="padding: 0 18px; font-size: 12px; height: 38px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; border-radius: 7px; cursor: pointer;">
+            <span>🔍</span> Search
+          </button>
+        </div>
+
+        <div class="table-wrap" style="max-height: 280px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px;">
+          <table style="width: 100%; min-width: 600px;">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>Registered</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="secondary-button" id="closeUserModalButton">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amenities Management Modal -->
+  <div id="amenityModal" class="modal hidden">
+    <div class="modal-card" style="width: min(100%, 650px); max-height: 90vh; overflow-y: auto;">
+      <button class="close-button" id="closeAmenityModal">×</button>
+      <p class="eyebrow">Platform Catalog</p>
+      <h2>Amenities Management</h2>
+      <p class="modal-description">Add and manage amenities available for apartment listings across the platform.</p>
+
+      <!-- Add Amenity Form -->
+      <section style="margin: 20px 0; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--cream);">
+        <h3 style="margin: 0 0 10px; font-size: 14px; color: var(--ink);">+ Add New Amenity</h3>
+        <form id="addAmenityForm" style="display: flex; gap: 10px; align-items: center;">
+          <input id="newAmenityName" type="text" placeholder="e.g. Swimming Pool, 24/7 Security, Rooftop Gym" required style="flex: 1; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px;" />
+          <button type="submit" id="addAmenitySubmitBtn" class="primary-button" style="white-space: nowrap; padding: 10px 18px;">Add Amenity →</button>
+        </form>
+        <p id="amenityMessage" class="message" style="margin-top: 8px; font-size: 11px;"></p>
+      </section>
+
+      <!-- Current Amenities List -->
+      <section style="margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0; font-size: 14px; color: var(--ink);">Current Amenities (<span id="amenityTotalCount">0</span>)</h3>
+          <button class="secondary-button" id="refreshAmenitiesBtn" style="padding: 4px 10px; font-size: 10px;">↻ Refresh</button>
+        </div>
+        <div id="amenitiesGrid" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 250px; overflow-y: auto; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: white;">
+          <p style="color: var(--muted); font-size: 12px;">Loading amenities...</p>
+        </div>
+      </section>
+
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="secondary-button" id="closeAmenityModalBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Amenity Popup Modal (Requirement #1) -->
+  <div id="editAmenityModal" class="modal hidden" style="position: fixed; inset: 0; z-index: 1070; display: flex; justify-content: center; align-items: center; background: rgba(16,42,44,0.72); backdrop-filter: blur(5px);">
+    <div class="modal-card" style="width: min(100%, 440px); position: relative; padding: 26px 28px; background: white; border-radius: 14px; box-shadow: var(--shadow);">
+      <button class="close-button" id="closeEditAmenityModal" style="position: absolute; top: 14px; right: 18px; font-size: 24px; cursor: pointer; border: none; background: transparent; color: var(--muted);">&times;</button>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+        <span style="font-size: 22px; width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center;">✏️</span>
+        <div>
+          <h3 style="margin: 0; font-size: 17px; color: var(--ink); font-family: Georgia, serif;">Update Feature & Amenity</h3>
+          <p style="margin: 2px 0 0; font-size: 11.5px; color: var(--muted);">Rename this amenity across all marketplace listings.</p>
+        </div>
+      </div>
+      <form id="editAmenityForm">
+        <input type="hidden" id="editAmenityId" />
+        <div style="margin-bottom: 16px;">
+          <label for="editAmenityNameInput" style="display: block; font-size: 11.5px; font-weight: bold; color: var(--ink); margin-bottom: 6px;">Amenity Name *</label>
+          <input type="text" id="editAmenityNameInput" required placeholder="Enter updated amenity title..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--ink); outline: none;" />
+        </div>
+        <p id="editAmenityMessage" class="message" style="margin-bottom: 12px; font-size: 11.5px; min-height: 16px;"></p>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--line); padding-top: 14px;">
+          <button type="button" id="cancelEditAmenityBtn" class="secondary-button" style="padding: 9px 16px; font-size: 11.5px; cursor: pointer;">Cancel</button>
+          <button type="submit" id="saveEditAmenityBtn" class="primary-button" style="padding: 9px 20px; font-size: 11.5px; font-weight: bold; cursor: pointer;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Amenity Confirmation Modal (Requirement #1) -->
+  <div id="deleteAmenityModal" class="modal hidden" style="position: fixed; inset: 0; z-index: 1070; display: flex; justify-content: center; align-items: center; background: rgba(16,42,44,0.72); backdrop-filter: blur(5px);">
+    <div class="modal-card" style="width: min(100%, 440px); position: relative; padding: 26px 28px; background: white; border-radius: 14px; box-shadow: var(--shadow);">
+      <button class="close-button" id="closeDeleteAmenityModal" style="position: absolute; top: 14px; right: 18px; font-size: 24px; cursor: pointer; border: none; background: transparent; color: var(--muted);">&times;</button>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <span style="font-size: 22px; width: 40px; height: 40px; border-radius: 10px; background: #ffe4e6; color: #e11d48; display: flex; align-items: center; justify-content: center;">🗑️</span>
+        <div>
+          <h3 style="margin: 0; font-size: 17px; color: #9f1239; font-family: Georgia, serif;">Delete Amenity</h3>
+          <p style="margin: 2px 0 0; font-size: 11.5px; color: var(--muted);">Confirm removal from the platform catalog.</p>
+        </div>
+      </div>
+      <input type="hidden" id="deleteAmenityId" />
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;">
+        <p style="margin: 0; font-size: 12px; color: #881337; line-height: 1.5;">
+          Are you sure you want to delete <strong id="deleteAmenityNameTarget" style="color: #4c0519;">Amenity Name</strong>?
+        </p>
+        <small style="display: block; margin-top: 6px; font-size: 10.5px; color: #9f1239;">
+          It will be safely detached from all associated apartment listings without breaking existing data records.
+        </small>
+      </div>
+      <p id="deleteAmenityMessage" class="message" style="margin-bottom: 12px; font-size: 11.5px; min-height: 16px;"></p>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--line); padding-top: 14px;">
+        <button type="button" id="cancelDeleteAmenityBtn" class="secondary-button" style="padding: 9px 16px; font-size: 11.5px; cursor: pointer;">Cancel</button>
+        <button type="button" id="confirmDeleteAmenityBtn" class="primary-button" style="padding: 9px 20px; font-size: 11.5px; font-weight: bold; background: #be123c; border: none; color: white; border-radius: 6px; cursor: pointer;">Yes, Delete Amenity</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Profile & Change Password Modal -->
+  <div id="profileModal" class="modal hidden">
+    <div class="modal-card" style="width: min(100%, 480px); max-height: 90vh; overflow-y: auto;">
+      <button class="close-button" id="closeProfileModal">×</button>
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <span class="avatar" style="width:52px; height:52px; font-size:18px; background:var(--ink); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">AD</span>
+        <div>
+          <h3 id="adminModalName" style="margin:0; font-size:18px; color:var(--ink);">System Administrator</h3>
+          <p style="margin:4px 0 0; font-size:13px; color:var(--muted);">Full System Access · <span style="color:var(--green, #2e7d32); font-weight:bold;">SUPERUSER</span></p>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div style="display:flex; border-bottom:1px solid var(--line); margin-bottom:16px; gap:8px;">
+        <button type="button" id="tabAdminProfileInfo" style="padding:8px 16px; border:none; background:transparent; font-size:12px; font-weight:700; color:var(--ink); border-bottom:2px solid var(--coral); cursor:pointer;">Admin Info</button>
+        <button type="button" id="tabAdminPassword" style="padding:8px 16px; border:none; background:transparent; font-size:12px; font-weight:700; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer;">Change Password 🔐</button>
+      </div>
+
+      <!-- Tab 1: Admin Profile Details & Settings -->
+      <div id="tabAdminContentProfile">
+        <form id="updateProfileForm" style="display:grid; gap:12px;">
+          <div style="background:var(--cream); padding:12px; border-radius:8px; border:1px solid var(--line);">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:bold; letter-spacing:0.5px;">Account Role</div>
+            <div style="font-size:13.5px; font-weight:bold; color:var(--ink); margin-top:2px;">Platform Administrator · Superuser</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <label style="font-size:11px; font-weight:bold; color:var(--ink);">First Name *
+              <input type="text" id="editFirstName" required style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+            </label>
+            <label style="font-size:11px; font-weight:bold; color:var(--ink);">Last Name *
+              <input type="text" id="editLastName" required style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+            </label>
+          </div>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Email (Read-Only)
+            <input type="email" id="editEmail" disabled style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; background:#f5f5f5; color:var(--muted); box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Phone Number
+            <input type="tel" id="editPhone" placeholder="+94 77 123 4567" style="width:100%; padding:8px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <p id="profileMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <button type="button" id="modalAdminLogoutButton" class="secondary-button" style="color:var(--coral); font-weight:bold;">Sign out</button>
+            <button type="submit" id="saveProfileBtn" class="primary-button" style="padding:9px 20px;">Save Changes →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab 2: Change Password -->
+      <div id="tabAdminContentPassword" class="hidden">
+        <form id="changePasswordForm" style="display:grid; gap:12px;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; font-size:12px; color:#166534; display:flex; gap:12px; align-items:flex-start;">
+            <span style="font-size:22px; line-height:1;">✉️</span>
+            <div>
+              <strong style="display:block; margin-bottom:2px; font-size:12.5px; color:#14532d;">Direct Security Email Alert</strong>
+              Confirmation email will be sent directly to your logged-in account: 
+              <strong id="changePasswordTargetEmail" style="color:#0f172a; text-decoration:underline;">[Logged-in Email]</strong>
+              <div style="font-size:11px; color:#15803d; margin-top:3px;">Dispatched automatically to active session · No email selection or typing needed.</div>
+            </div>
+          </div>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Current Password *
+            <input type="password" id="changeCurrentPassword" required placeholder="Enter current password" style="width:100%; padding:9px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">New Password (min 8 characters) *
+            <input type="password" id="changeNewPassword" minlength="8" required placeholder="••••••••" style="width:100%; padding:9px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <label style="font-size:11px; font-weight:bold; color:var(--ink);">Confirm New Password *
+            <input type="password" id="changeConfirmPassword" minlength="8" required placeholder="••••••••" style="width:100%; padding:9px; margin-top:4px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box;" />
+          </label>
+          <p id="passwordChangeMessage" class="message" style="margin:4px 0; font-size:11px; min-height:16px;"></p>
+          <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px;">
+            <button type="submit" id="savePasswordBtn" class="primary-button" style="padding:9px 22px; background:var(--coral); color:white; border:none; border-radius:7px; cursor:pointer; font-size:12px; font-weight:bold;">Update Password & Send Email Alert →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Performance Report Generator Modal (UC-05) -->
+  <div id="reportModal" class="modal hidden" style="position: fixed; inset: 0; z-index: 1050; display: flex; justify-content: center; align-items: flex-start; padding: 30px 16px 60px; background: rgba(16,42,44,0.68); backdrop-filter: blur(4px); overflow-y: auto;">
+    <div class="modal-card" style="position: relative; width: min(100%, 960px); max-height: 90vh; overflow-y: auto; padding: 28px 32px; border-radius: 16px; background: #fffdf9; box-shadow: 0 25px 60px rgba(16,42,44,0.35); border: 1px solid var(--line); margin: 20px auto;">
+      <button class="close-button" id="closeReportModal" style="position: absolute; top: 18px; right: 20px; font-size: 24px; cursor: pointer;">×</button>
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; padding-right: 36px;">
+        <div>
+          <p class="eyebrow" style="margin: 0 0 6px;">Executive Analytics & Oversight · UC-05</p>
+          <h2 style="margin: 0; font-family: Georgia, serif; font-size: 28px; color: var(--ink);">Generate Business Performance Reports</h2>
+          <p style="margin: 6px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.5;">
+            Aggregate and analyze platform transactions, apartment listings, and user accounts. Select filters, inspect executive KPI summaries, and export in CSV or PDF.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="background: #eef7f3; color: #166534; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; border: 1px solid #bbf7d0;">
+            ✓ Admin Authorized
+          </span>
+        </div>
+      </div>
+
+      <!-- Step 1: Filter Selection Panel (UC-05 Step 1) -->
+      <section style="background: #faf8f5; border: 1px solid #e6e2d9; border-radius: 12px; padding: 18px 20px; margin-bottom: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink);">
+            ⚙ Step 1: Report Configuration & Filters
+          </strong>
+          <button type="button" id="resetReportFiltersBtn" style="border: none; background: transparent; color: var(--coral); font-size: 11px; font-weight: 700; cursor: pointer;">
+            ↺ Reset Filters
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; align-items: flex-end;">
+          <!-- Report Domain / Transaction Type -->
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 5px;">
+              Transaction / Report Type
+            </label>
+            <select id="reportDomainFilter" style="width: 100%; height: 38px; border: 1px solid var(--line); border-radius: 7px; padding: 0 10px; font-size: 11.5px; background: white; color: var(--ink); cursor: pointer;">
+              <option value="ALL">All Modules (Comprehensive Performance)</option>
+              <option value="TRANSACTIONS">💰 All Financial Revenues (Subscriptions, Listing Passes & Viewing Deposits)</option>
+              <option value="AGENT_SUBSCRIPTIONS">💎 Agent Subscription Plans (Pro LKR 4,900 / Elite LKR 12,900)</option>
+              <option value="PAY_PER_LISTING">💳 Single Listing Passes & Extra Slots (LKR 2,500)</option>
+              <option value="VIEWING_DEPOSITS">📅 Viewing Advance Deposits (LKR 5,000)</option>
+              <option value="PUBLISHED_LISTINGS">🏢 Active Published Property Listings (with Valuation Totals)</option>
+              <option value="LISTINGS">Apartment Listings & Verifications (All)</option>
+              <option value="USERS">User Registrations & Growth</option>
+            </select>
+          </div>
+
+          <!-- Date Range Filter -->
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 5px;">
+              Date Range
+            </label>
+            <select id="reportDateRangeFilter" style="width: 100%; height: 38px; border: 1px solid var(--line); border-radius: 7px; padding: 0 10px; font-size: 11.5px; background: white; color: var(--ink); cursor: pointer;">
+              <option value="ALL_TIME" selected>All Time</option>
+              <option value="TODAY">Today (Last 24 Hours)</option>
+              <option value="LAST_7_DAYS">Last 7 Days</option>
+              <option value="LAST_30_DAYS">Last 30 Days</option>
+              <option value="THIS_MONTH">This Month</option>
+              <option value="CUSTOM">Custom Date Range...</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 5px;">
+              Status Criteria
+            </label>
+            <select id="reportStatusFilter" style="width: 100%; height: 38px; border: 1px solid var(--line); border-radius: 7px; padding: 0 10px; font-size: 11.5px; background: white; color: var(--ink); cursor: pointer;">
+              <option value="ALL">All Statuses</option>
+              <option value="COMPLETED">Completed / Published / Active</option>
+              <option value="PENDING">Pending Review / Awaiting Action</option>
+              <option value="CANCELLED">Cancelled / Rejected / Suspended</option>
+            </select>
+          </div>
+
+          <!-- Apply Button -->
+          <div>
+            <button type="button" id="applyReportFiltersBtn" class="primary-button" style="width: 100%; height: 38px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+              <span>⚡ Aggregate Data</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Date Inputs (Shown if CUSTOM selected) -->
+        <div id="customDateRangeBox" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line);">
+          <div>
+            <label style="font-size: 10.5px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 4px;">Start Date</label>
+            <input type="date" id="customStartDate" style="width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 11.5px; background: white;" />
+          </div>
+          <div>
+            <label style="font-size: 10.5px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 4px;">End Date</label>
+            <input type="date" id="customEndDate" style="width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 11.5px; background: white;" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2 & 3: Aggregated KPI Summary Cards & Visual Distribution (UC-05 Step 2 & 3) -->
+      <section id="reportSummarySection" style="margin-bottom: 22px;">
+        <h3 style="margin: 0 0 12px; font-size: 13px; color: var(--ink); text-transform: uppercase; letter-spacing: 0.8px;">
+          📊 Executive Summary & Aggregated Metrics
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <!-- KPI 1: Records Count -->
+          <div style="padding: 16px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 2px 8px rgba(16,42,44,0.03);">
+            <span style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--muted); display: block;">Total Records Analyzed</span>
+            <strong id="kpiTotalRecords" style="font-family: Georgia, serif; font-size: 26px; color: var(--ink); margin-top: 4px; display: block;">0</strong>
+            <small id="kpiDomainSubtitle" style="font-size: 10px; color: var(--muted);">Aggregated entries</small>
+          </div>
+
+          <!-- KPI 2: Financial Volume -->
+          <div style="padding: 16px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 2px 8px rgba(16,42,44,0.03);">
+            <span style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--muted); display: block;">Financial Volume</span>
+            <strong id="kpiTotalVolume" style="font-family: Georgia, serif; font-size: 24px; color: var(--coral); margin-top: 4px; display: block;">LKR 0</strong>
+            <small style="font-size: 10px; color: #166534;">Viewing deposits & fees</small>
+          </div>
+
+          <!-- KPI 3: Completion Rate -->
+          <div style="padding: 16px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 2px 8px rgba(16,42,44,0.03);">
+            <span style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--muted); display: block;">Completion Rate</span>
+            <strong id="kpiSuccessRate" style="font-family: Georgia, serif; font-size: 26px; color: #166534; margin-top: 4px; display: block;">0%</strong>
+            <small id="kpiSuccessSubtitle" style="font-size: 10px; color: var(--muted);">Published / Active / Accepted</small>
+          </div>
+
+          <!-- KPI 4: Pending Action -->
+          <div style="padding: 16px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 2px 8px rgba(16,42,44,0.03);">
+            <span style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--muted); display: block;">Pending Review</span>
+            <strong id="kpiPendingCount" style="font-family: Georgia, serif; font-size: 26px; color: #b45309; margin-top: 4px; display: block;">0</strong>
+            <small style="font-size: 10px; color: var(--muted);">Requires verification/action</small>
+          </div>
+        </div>
+
+        <!-- Aggregated Progress Breakdown Bar -->
+        <div style="background: white; border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px;">
+            <span style="font-weight: 700; color: var(--ink);">Status Distribution</span>
+            <span id="reportDistributionLegend" style="color: var(--muted); font-size: 10.5px;">Active / Pending / Inactive</span>
+          </div>
+          <div style="height: 8px; width: 100%; border-radius: 10px; overflow: hidden; background: #e2e8f0; display: flex;">
+            <div id="barCompleted" style="background: #10b981; width: 0%; transition: width 0.3s;" title="Completed/Published"></div>
+            <div id="barPending" style="background: #f59e0b; width: 0%; transition: width 0.3s;" title="Pending"></div>
+            <div id="barCancelled" style="background: #ef4444; width: 0%; transition: width 0.3s;" title="Cancelled/Rejected"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Records Breakdown Table & Extension 2a Empty State -->
+      <section style="margin-bottom: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <strong style="font-size: 12.5px; color: var(--ink);">Filtered Records Breakdown (<span id="reportRecordCount">0</span>)</strong>
+          <span id="reportFilterPill" style="font-size: 10px; background: var(--cream); border: 1px solid var(--line); padding: 3px 8px; border-radius: 12px; color: var(--muted);">Filtered by: All</span>
+        </div>
+
+        <div id="reportTableWrap" class="table-wrap" style="max-height: 280px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px;">
+          <table style="width: 100%; min-width: 700px;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Ref / ID</th>
+                <th>Domain</th>
+                <th>Item / Detail</th>
+                <th>Party / User</th>
+                <th>Value (LKR)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody"></tbody>
+            <tfoot id="reportTableFoot"></tfoot>
+          </table>
+        </div>
+
+        <!-- Extension 2a: Empty Report State -->
+        <div id="reportEmptyState" class="empty-state hidden" style="padding: 32px; background: white; border: 1px solid var(--line); border-radius: 8px; margin-top: 10px; text-align: center;">
+          <p style="font-size: 32px; margin: 0 0 10px;">📂</p>
+          <strong style="display: block; font-size: 15px; color: var(--ink); margin-bottom: 6px;">No data matches the selected filters</strong>
+          <p style="margin: 0 0 14px; font-size: 12px; color: var(--muted);">
+            No records were found matching your current date range and status criteria. Try broadening your filters to view aggregated business data.
+          </p>
+          <button type="button" class="secondary-button" id="btnEmptyResetFilters" style="padding: 7px 16px; font-size: 11px; cursor: pointer;">
+            Reset Report Filters
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 4: Export Actions (UC-05 Step 4) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 18px; border-top: 1px solid var(--line); flex-wrap: wrap; gap: 12px;">
+        <div style="font-size: 11px; color: var(--muted);">
+          Export Formats: <strong>Standard CSV (Excel ready)</strong> or <strong>Printable PDF Report</strong>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button type="button" id="closeReportModalBtn" class="secondary-button" style="padding: 10px 18px; font-size: 12px; cursor: pointer;">Close</button>
+          <button type="button" id="btnExportCsv" class="secondary-button" style="padding: 10px 18px; font-size: 12px; font-weight: 700; color: #166534; border-color: #86efac; background: #f0fdf4; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+            <span>📥 Export as CSV</span>
+          </button>
+          <button type="button" id="btnExportPdf" class="primary-button" style="padding: 10px 22px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+            <span>🖨️ Export as PDF / Print</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Notifications Modal -->
+  <div id="adminNotifModal" class="modal hidden" style="position: fixed; inset: 0; z-index: 1050; display: flex; justify-content: center; align-items: center; background: rgba(16,42,44,0.68); backdrop-filter: blur(4px);">
+    <div class="modal-card" style="width: min(100%, 540px); max-height: 85vh; overflow-y: auto; position: relative; padding: 26px 28px; background: white; border-radius: 14px; box-shadow: var(--shadow);">
+      <button class="close-button" id="closeAdminNotifModal" style="position: absolute; top: 14px; right: 18px; font-size: 24px; cursor: pointer; border: none; background: transparent; color: var(--muted);">&times;</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--line); padding-bottom:10px; padding-right: 30px;">
+        <h3 style="margin:0; font-size:18px; color:var(--ink); font-family:Georgia,serif;">🔔 Administrative Notifications</h3>
+        <div style="display:flex; gap:8px;">
+          <button id="markAllAdminNotifsReadBtn" style="border:none; background:#f1f5f9; padding:5px 10px; border-radius:6px; color:#475569; cursor:pointer; font-size:11px; font-weight:bold;">Mark all read</button>
+          <button id="refreshAdminNotifsBtn" style="border:none; background:transparent; color:var(--coral); cursor:pointer; font-size:12px; font-weight:bold;">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="adminNotifList" style="display:grid; gap:10px; max-height:400px; overflow-y:auto; padding-right:4px;">
+        <p style="color:var(--muted); font-size:13px;">Loading notifications...</p>
+      </div>
+      <div style="display:flex; justify-content:flex-end; margin-top:16px; border-top:1px solid var(--line); padding-top:12px;">
+        <button class="secondary-button" id="closeAdminNotifModalBtn" style="padding: 8px 18px; font-size: 11.5px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Verification Override / Unpublish Modal -->
+  <div id="adminOverrideModal" class="modal hidden" style="position: fixed; inset: 0; z-index: 1060; display: flex; justify-content: center; align-items: center; background: rgba(16,42,44,0.72); backdrop-filter: blur(4px);">
+    <div class="modal-card" style="width: min(100%, 540px); max-height: 88vh; overflow-y: auto; position: relative; padding: 28px 30px; background: white; border-radius: 14px; box-shadow: var(--shadow);">
+      <button class="close-button" id="closeAdminOverrideModal" style="position: absolute; top: 14px; right: 18px; font-size: 24px; cursor: pointer; border: none; background: transparent; color: var(--muted);">&times;</button>
+      
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; border-bottom:1px solid var(--line); padding-bottom:12px;">
+        <span style="font-size:26px;">⚠️</span>
+        <div>
+          <h3 style="margin:0; font-size:18px; color:#be123c; font-family:Georgia,serif;">Revoke Verification & Unpublish Listing</h3>
+          <p style="margin:2px 0 0; font-size:11.5px; color:var(--muted);">Executive authority to withdraw non-compliant or defective property listings from the marketplace.</p>
+        </div>
+      </div>
+
+      <form id="adminOverrideForm" style="display:grid; gap:14px;">
+        <div style="background:#faf8f5; border:1px solid var(--line); border-radius:8px; padding:12px 14px;">
+          <label style="display:block; font-size:11px; font-weight:bold; color:var(--ink); margin-bottom:4px;">Target Listing ID or Search</label>
+          <div style="display:flex; gap:8px;">
+            <input type="number" id="overrideListingIdInput" required placeholder="Enter Listing ID (e.g. 1)" style="flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:6px; font-size:12px;" />
+            <button type="button" id="btnLookupOverrideListing" class="secondary-button" style="padding:8px 14px; font-size:11.5px; cursor:pointer;">Lookup</button>
+          </div>
+          <div id="overrideListingPreview" style="margin-top:8px; font-size:11.5px; color:#334155; line-height:1.4; display:none; background:white; padding:8px 10px; border-radius:6px; border:1px solid #e2e8f0;">
+            <strong id="overridePreviewTitle" style="color:var(--ink);">Apartment Title</strong>
+            <span id="overridePreviewMeta" style="display:block; font-size:10.5px; color:var(--muted);">Status: PUBLISHED</span>
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:bold; color:var(--ink); margin-bottom:4px;">Administrative Action *</label>
+          <select id="overrideActionSelect" required style="width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-size:12px; background:white;">
+            <option value="UNPUBLISH" selected>🚫 Revoke Publication & Reject (Defects / Policy Violations)</option>
+            <option value="REQUEST_DOCUMENTS">📋 Unpublish & Request Additional Supporting Documents</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:bold; color:var(--ink); margin-bottom:4px;">Defect Description / Official Reason for Override *</label>
+          <textarea id="overrideReasonInput" required rows="3" placeholder="Explain the specific flaws or issues identified in this listing (e.g., Unclear ownership deeds, inaccurate boundary plans, misstated square footage)..." style="width:100%; box-sizing:border-box; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-size:11.5px; font-family:inherit; resize:vertical;"></textarea>
+          <small style="color:var(--muted); font-size:10px;">This official explanation will be permanently recorded in verification audit history and dispatched to the property owner.</small>
+        </div>
+
+        <p id="overrideMessage" class="message" style="margin:2px 0; font-size:11.5px; min-height:16px;"></p>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px; border-top:1px solid var(--line); padding-top:12px;">
+          <button type="button" id="cancelOverrideBtn" class="secondary-button" style="padding:9px 16px; font-size:11.5px; cursor:pointer;">Cancel</button>
+          <button type="submit" id="submitOverrideBtn" class="primary-button" style="padding:9px 20px; font-size:11.5px; background:#be123c; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+            Confirm Override & Revoke Publication
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/admin_page.js"></script>
+</body>
+</html>
